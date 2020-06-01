@@ -40,7 +40,7 @@ editor_options:
 
 *File creation: March 13, 2020*  
 
-*Final Update: May 31, 2020* 
+*Final Update: June 1, 2020* 
 
 **Approximate time: 60 - 120 minutes**
 
