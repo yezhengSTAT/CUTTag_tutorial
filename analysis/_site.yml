@@ -1,7 +1,7 @@
-name: "CUTTag_tutorial"
+name: CUTTag_tutorial
 output_dir: ../docs
 navbar:
-  title: "CUTTag_tutorial"
+  title: CUTTag_tutorial
   left:
   - text: Home
     href: index.html
@@ -9,6 +9,10 @@ navbar:
     href: about.html
   - text: License
     href: license.html
+  right:
+  - icon: fa-github
+    text: Source code
+    href: https://github.com/yezhengSTAT/CUTTag_tutorial
 output:
   workflowr::wflow_html:
     toc: yes
