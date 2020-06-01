@@ -9,9 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Ye Zheng, Kami Ahmand" />
 
 
-<title>Home</title>
+<title>CUT&amp;Tag Data Processing and Analysis Tutorial</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,9 +20,15 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -253,7 +260,73 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
 
 
 
@@ -263,6 +336,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -298,16 +381,25 @@ $(document).ready(function () {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
 
 
-<h1 class="title toc-ignore">Home</h1>
+
+<h1 class="title toc-ignore">CUT&amp;Tag Data Processing and Analysis Tutorial</h1>
+<h4 class="author">Ye Zheng, Kami Ahmand</h4>
 
 </div>
 
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -316,7 +408,7 @@ $(document).ready(function () {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -328,7 +420,7 @@ $(document).ready(function () {
 <strong>Last updated:</strong> 2020-06-01
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>CUTTag_tutorial/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
@@ -340,7 +432,7 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <hr>
 </div>
 <div id="checks" class="tab-pane fade">
-<div id="workflowr-checks" class="panel-group">
+<div class="panel-group" id="workflowr-checks">
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
@@ -356,16 +448,100 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstronga678360"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> a678360 </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
 </p>
 </div>
-<div id="strongRepositoryversionstronga678360" class="panel-collapse collapse">
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200415code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20200415)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200415code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200415)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+</p>
+</div>
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it difficult for you and others to run your code on a different machine. Change the absolute path(s) below to the suggested relative path(s) to make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/fh/fast/gottardo_r/yezheng_working/cuttag/CUTTag_tutorial
+</td>
+<td style="text-align:left;">
+.
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongcbd9c8c"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> cbd9c8c </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongcbd9c8c" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version a678360. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version cbd9c8c. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -438,6 +614,40 @@ Message
 <tbody>
 <tr>
 <td>
+Rmd
+</td>
+<td>
+cbd9c8c
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-06-01
+</td>
+<td>
+Publish the initial files for myproject
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+2e55365
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-06-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
 html
 </td>
 <td>
@@ -477,7 +687,958 @@ Start workflowr project.
 </div>
 </div>
 </div>
-<p>Welcome to my research website.</p>
+<!-- --- -->
+<!-- title: "CUT&Tag Data Processing and Analysis Tutorial" -->
+<!-- author: "Ye Zheng" -->
+<!-- output: -->
+<!--   html_document: -->
+<!--     toc: true -->
+<!--     toc_float: true -->
+<!--     #number_sections: false -->
+<!--     code_folding: show -->
+<!-- editor_options: -->
+<!--   chunk_output_type: console -->
+<!-- --- -->
+<!-- <style> -->
+<!-- body{text-align: justify} -->
+<!-- pre code, pre, code { -->
+<!--   white-space: pre !important; -->
+<!--   overflow-x: scroll !important; -->
+<!--   word-break: keep-all !important; -->
+<!--   word-wrap: initial !important; -->
+<!-- } -->
+<!-- </style> -->
+<p><em>contact: <a href="mailto:yzheng23@fredhutch.org" class="email">yzheng23@fredhutch.org</a></em></p>
+<p><em>File creation: March 13, 2020</em></p>
+<p><em>Final Update: May 31, 2020</em></p>
+<p><strong>Approximate time: 60 - 120 minutes</strong></p>
+<div id="i.-introduction" class="section level1">
+<h1>I. Introduction</h1>
+<div id="overview-of-cuttag" class="section level2">
+<h2>1.1. Overview of CUT&amp;Tag</h2>
+<p>Cleavage Under Targets and Tagmentation (CUT&amp;Tag) is an epigenomic profiling strategy in which antibodies are bound to chromatin proteins in situ in permeabilized nuclei, and then used to tether the cut-and-paste transposase Tn5. Activation of the transposase simultaneously cleaves DNA and adds DNA sequencing adapters (“tagmentation”) for paired-end DNA sequencing. The most recent streamlined CUT&amp;Tag protocol has successfully suppressed exposure artifacts to ensure high-fidelity mapping of the antibody-targeted protein and improved signal-to-noise over current chromatin profiling methods. Streamlined CUT&amp;Tag can be performed in a single PCR tube from cells to amplified libraries, providing low-cost high-resolution genome-wide chromatin maps. By simplifying library preparation, CUT&amp;Tag requires less than a day at the bench from live cells to sequencing-ready barcoded libraries. Because of low background levels, barcoded and pooled CUT&amp;Tag libraries can be sequenced for ~$25 per sample, enabling routine genome-wide profiling of chromatin proteins and modifications that requires no special skills or equipment.</p>
+<p>The mapping of chromatin features genome-wide has traditionally been performed using chromatin immunoprecipitation (ChIP), in which chromatin is cross-linked and solubilized and an antibody to a protein or modification of interest is used to immunoprecipitate the bound DNA. Very little has changed in the way ChIP is most generally performed since it was first described 35 years ago, and remains fraught with signal-to-noise issues and artifacts. An alternative chromatin profiling strategy is enzyme tethering in situ whereby the chromatin protein or modification of interest is targeted by an antibody or fusion protein, and the underlying DNA is marked or released. A succession of enzyme-tethering methods have been introduced over the past two decades. Cleavage Under Targets &amp; Tagmentation (CUT&amp;Tag) is a tethering method that uses a protein-A-Tn5 (pA-Tn5) transposome fusion protein. Permeabilized cells or nuclei are incubated with antibody to a specified chromatin protein, and then pA-Tn5 loaded with mosaic end adaptors is successively tethered to antibody-bound sites. Activation of the transposome by adding magnesium ions results in the integration of the adaptors into nearby DNA. These are then amplified to generate sequencing libraries. Antibody-tethered Tn5-based methods achieve high sensitivity owing to stringent washing of samples after pA-Tn5 tethering and the high efficiency of adaptor integration. The improved signal-to-noise relative to ChIP-seq translates to an order-of-magnitude reduction in the amount of sequencing required to map chromatin features. Therefore, we use barcoded PCR primers to enable sample-pooling (typically up to 90 samples) for paired-end sequencing on Illumina NGS sequencers.</p>
+<p>With all the differences between ChIP-seq and CUT&amp;Tag data, we launched this tutorial tailored for processing and analyzing CUT&amp;Tag data.</p>
+<div class="figure">
+<img src="figures/ChIPseqCUTTag.png" alt="Figure 1. Differences between immunoprecipitation and in antibody-targeted chromatin profiling strategies." />
+<p class="caption"><strong>Figure 1. Differences between immunoprecipitation and in antibody-targeted chromatin profiling strategies.</strong></p>
+</div>
+</div>
+<div id="objectives" class="section level2">
+<h2>1.2. Objectives</h2>
+<p>This tutorial is designed for processing and analyzing CUT&amp;Tag data following the <a href="https://www.protocols.io/view/bench-top-cut-amp-tag-bcuhiwt6/abstract">Bench top CUT&amp;Tag V.3 protocol</a>, an enzyme-tethering strategy that provides efficient high-resolution sequencing libraries for profiling diverse chromatin components.</p>
+</div>
+<div id="requirements" class="section level2">
+<h2>1.3. Requirements</h2>
+<ul>
+<li><p>Linux system</p></li>
+<li>R (versions &gt;= 3.6)
+<ul>
+<li>dplyr</li>
+<li>stringr</li>
+<li>ggplot2</li>
+<li>viridis</li>
+<li>GenomicRanges</li>
+<li>chromVAR</li>
+<li>DESeq2</li>
+<li>ChIPseqSpikeInFree</li>
+</ul></li>
+<li><p>FastQC(version &gt;= 0.11.9)</p></li>
+<li><p>Bowtie2 (version &gt;= 2.3.4.3)</p></li>
+<li><p>samtools (version &gt;= 1.10)</p></li>
+<li><p>bedtools (version &gt;= 2.29.1)</p></li>
+<li><p>Picard (version &gt;= 2.18.29)</p></li>
+<li><p>SEACR (version &gt;= 1.3)</p></li>
+<li><p>deepTools (version &gt;= 2.0)</p></li>
+</ul>
+</div>
+<div id="data" class="section level2">
+<h2>1.4. Data</h2>
+<p>In this tutorial, we use data from Kaya-Okur et al. (2020).</p>
+<ul>
+<li>H3K27me3:
+<ul>
+<li>SH_Hs_K27m3_NX_0918 as replicate 1</li>
+<li>SH_Hs_K27m3_Xpc_0107 as replicate 2</li>
+</ul></li>
+<li>H3K4me3:
+<ul>
+<li>SH_Hs_K4m3_NX_0918 as replicate 1</li>
+<li>SH_Hs_K4m3_Xpc_0107 as replicate 2</li>
+</ul></li>
+<li>IgG:
+<ul>
+<li>SH_Hs_IgG_o_2kA_0919 as replicate 1</li>
+<li>SH_Hs_IgG_n_6kA_0918 as replicate 2</li>
+</ul></li>
+</ul>
+</div>
+<div id="download-the-data" class="section level2">
+<h2>1.5. Download the data</h2>
+<p>We will do the data downloading, pre-processing and processing on each histone sample respectively. In this tutorial, we will use H3K27me3 replicate 1 as the illustration.</p>
+<p>First, we need to denote the histone name and project path.</p>
+<pre class="bash"><code>##== linux command ==##
+histName=&quot;K27me3_rep1&quot;
+projPath=&quot;/path/to/project/where/data/and/results/are/saved&quot;</code></pre>
+<p>Data were downloaded from <code>http://heniweb.fhcrc.org/data/hs20190927_SH.html</code>.</p>
+<pre class="bash"><code>##== linux command ==##
+mkdir -p $projPath/data
+wget -P $projPath/data path/to/open/source/data</code></pre>
+</div>
+</div>
+<div id="ii.-data-pre-processing" class="section level1">
+<h1>II. Data Pre-processing</h1>
+<div id="merge-technical-replicate-if-needed-optional" class="section level2">
+<h2>2.1. Merge technical replicate if needed [Optional]</h2>
+<pre class="bash"><code>##== linux command ==##
+mkdir -p ${projPath}/fastq
+cat ${projPath}/data/${histName}/*_R1_*.fastq.gz &gt;${projPath}/fastq/${histName}_R1.fastq.gz
+cat ${projPath}/data/${histName}/*_R2_*.fastq.gz &gt;${projPath}/fastq/${histName}_R2.fastq.gz</code></pre>
+</div>
+<div id="quality-control-using-fastqc-optional" class="section level2">
+<h2>2.2. Quality Control using <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> [Optional]</h2>
+<div id="obtain-fastqc" class="section level3">
+<h3>2.2.1 Obtain FastQC</h3>
+<pre class="bash"><code>##== linux command ==##
+mkdir -p $projPath/tools
+wget -P $projPath/tools https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.9.zip
+cd $projPath/tools
+unzip fastqc_v0.11.9.zip</code></pre>
+</div>
+<div id="run-fastqc-for-quality-check" class="section level3">
+<h3>2.2.2 Run FastQC for quality check</h3>
+<pre class="bash"><code>##== linux command ==##
+mkdir -p ${projPath}/fastqFileQC/${histName}
+
+$projPath/tools/FastQC/fastqc -o ${projPath}/fastqFileQC/${histName} -f fastq ${projPath}/fastq/${histName}_R1.fastq.gz
+$projPath/tools/FastQC/fastqc -o ${projPath}/fastqFileQC/${histName} -f fastq ${projPath}/fastq/${histName}_R2.fastq.gz</code></pre>
+</div>
+<div id="intepret-the-quality-check-results." class="section level3">
+<h3>2.2.3 Intepret the quality check results.</h3>
+<p>Quality check reference: <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/bad_sequence_fastqc.html">https://www.bioinformatics.babraham.ac.uk/projects/fastqc/bad_sequence_fastqc.html</a></p>
+<div class="figure">
+<img src="figures/R1_sequenceContent.png" alt="Figure 2. Per base sequence content fails the FastQC quality check." />
+<p class="caption"><strong>Figure 2. Per base sequence content fails the FastQC quality check.</strong></p>
+</div>
+<p><strong>??</strong> - Tn5 preference</p>
+<ul>
+<li>The discordant sequence content at the begining of the reads are common phenomenon for CUT&amp;Tag reads. What you might be detecting is the 10-bp periodicity that shows up as a sawtooth pattern in the length distribution. If so, this is normal and will not affect alignment or peak calling. In any case we do not recommend trimming as the bowtie2 parameters that we list will give accurate mapping information without trimming.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="iii.-alignment" class="section level1">
+<h1>III. Alignment</h1>
+<div id="bowtie2-alignment-required" class="section level2">
+<h2>3.1. Bowtie2 alignment [required]</h2>
+<pre class="bash"><code>##== linux command ==##
+cores=8
+ref=&quot;/path/to/bowtie2Index/hg38&quot;
+
+mkdir -p ${projPath}/alignment/sam/bowtie2_summary
+mkdir -p ${projPath}/alignment/bam
+mkdir -p ${projPath}/alignment/bed
+mkdir -p ${projPath}/alignment/bedgraph
+
+## Build the bowtie2 reference genome index if needed:
+## bowtie2-build path/to/hg38/fasta/hg38.fa /path/to/bowtie2Index/hg38
+
+bowtie2 --end-to-end --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700 -p ${cores} -x ${ref} -1 ${projPath}/fastq/${histName}_R1.fastq.gz -2 ${projPath}/fastq/${histName}_R2.fastq.gz -S ${projPath}/alignment/sam/${histName}_bowtie2.sam &amp;&gt; ${projPath}/alignment/sam/bowtie2_summary/${histName}_bowtie2.txt</code></pre>
+<p>The paired-end reads are aligned by Bowtie2 using parameters: <code>--end-to-end --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700</code></p>
+<p>Parameters explanation:</p>
+<p><a href="http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml" class="uri">http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml</a></p>
+<p>Bowtie2 alignment results summary is saved at <code>${projPath}/alignment/sam/bowtie2)summary/${histName}_bowtie2.txt</code>:</p>
+<pre><code>2984630 reads; of these:
+  2984630 (100.00%) were paired; of these:
+    125110 (4.19%) aligned concordantly 0 times
+    2360430 (79.09%) aligned concordantly exactly 1 time
+    499090 (16.72%) aligned concordantly &gt;1 times
+95.81% overall alignment rate</code></pre>
+<ul>
+<li>2984640 is the sequencing depth, i.e., total number of paired reads.</li>
+<li>125110 is the number of read pairs that fail to be mapped.</li>
+<li>2360430 + 499090 is the number of read paris that are successfully mapped.</li>
+<li>95.81% is the overall alignment rate</li>
+</ul>
+<div id="sequencing-depth" class="section level3">
+<h3>3.1.1 Sequencing depth</h3>
+<p>We first check the sequencing depth of the data we have.</p>
+<pre class="r"><code>##=== R command ===## 
+## Path to the project and histone list
+projPath = &quot;/fh/fast/gottardo_r/yezheng_working/cuttag/CUTTag_tutorial&quot;
+histList = c(&quot;K27me3_rep1&quot;, &quot;K27me3_rep2&quot;, &quot;K4me3_rep1&quot;, &quot;K4me3_rep2&quot;, &quot;IgG_rep1&quot;, &quot;IgG_rep2&quot;)
+
+## Collect the alignment results from the bowtie2 alignment summary files
+alignResult = c()
+for(hist in histList){
+  alignRes = read.table(paste0(projPath, &quot;/alignment/sam/bowtie2_summary/&quot;, hist, &quot;_bowtie2.txt&quot;), header = FALSE, fill = TRUE)
+  alignRate = substr(alignRes$V1[6], 1, nchar(as.character(alignRes$V1[6]))-1)
+  histInfo = strsplit(hist, &quot;_&quot;)[[1]]
+  alignResult = data.frame(seqDepth = alignRes$V1[1] %&gt;% as.character %&gt;% as.numeric, alignNum = alignRes$V1[4] %&gt;% as.character %&gt;% as.numeric + alignRes$V1[5] %&gt;% as.character %&gt;% as.numeric, alignRate = alignRate %&gt;% as.numeric, Histone = histInfo[1], Replicate = histInfo[2])  %&gt;% rbind(alignResult, .)
+}
+
+## Generate sequencing depth boxplot
+alignResult %&gt;% ggplot(aes(x = Histone, y = seqDepth, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;Sequencing Depth&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ul>
+<li>Millions of reads are collected for the illustration data.</li>
+<li>A reasonable minimum sequencing depth is <strong>??</strong></li>
+</ul>
+</div>
+<div id="alignemnt-rate" class="section level3">
+<h3>3.1.2 Alignemnt rate</h3>
+<p>One aspect to check the quality of the data is to look at the alignment rate.</p>
+<pre class="r"><code>##=== R command ===## 
+alignResult %&gt;% ggplot(aes(x = Histone, y = alignRate, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;% of Mapped Fragments&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ul>
+<li>The alignment rates are all above 90% which is pretty high.</li>
+</ul>
+</div>
+<div id="number-of-alignable-reads" class="section level3">
+<h3>3.1.3 Number of alignable reads</h3>
+<p>After alignment, we can check the number of mapped reads, i.e., valid sequencing depth for downstream analysis.</p>
+<pre class="r"><code>##=== R command ===## 
+alignResult %&gt;% ggplot(aes(x = Histone, y = alignNum, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;# of Mapped Fragments&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ul>
+<li>There are still millions of reads that are alignable and pass on to downstream analysis.</li>
+</ul>
+</div>
+</div>
+<div id="filtering-mapped-reads-by-the-mapping-quality-filtering-optinal" class="section level2">
+<h2>3.2. Filtering mapped reads by the mapping quality filtering [optinal]</h2>
+<p>Some project may require more stringent filtering on the alignment quality score. This <a href="http://biofinysics.blogspot.com/2014/05/how-does-bowtie2-assign-mapq-scores.html">blog</a> detailedly discussed how does bowtie assign quality score with examples.</p>
+<p>MAPQ(x) = -10 * <span class="math inline">\(log_{10}\)</span>(P(x is mapped wrongly)) = -10 * <span class="math inline">\(log_{10}(p)\)</span></p>
+<p>which ranges from 0 to 37, 40 or 42.</p>
+<p><code>samtools view -q minQualityScore</code> will eliminate all the alignment results that are below the minQualityScore defined by user.</p>
+<pre class="bash"><code>##== linux command ==##
+minQualityScore=2
+samtools view -q $minQualityScore ${projPath}/alignment/sam/${histName}_bowtie2.sam &gt;${projPath}/alignment/sam/${histName}_bowtie2.qualityScore$minQualityScore.sam</code></pre>
+<ul>
+<li>If you do implement this filtering, please replace the following input sam file into this filtered sam file.</li>
+</ul>
+</div>
+<div id="remove-duplicates-optionalrequired" class="section level2">
+<h2>3.3. Remove duplicates [optional/required]</h2>
+<ul>
+<li><p>CUT&amp;Tag uses the antibody-tethered Tn5-based methods that can achieve high sensitivity, hence the resulting background noise is low and signal regions are enriched and narrow. Therefore, theoretically we may collect fragments that share exactly the same starting and ending sequences which are not because of the PCR duplication.</p></li>
+<li><p>Practically, we found for high quality and high sequencing depth samples, the duplication rate is pretty low and the rest duplicated fragments are highly likely to be the true enrichment signals. Thus, for these sample, we do not recommend removing the duplicates.</p></li>
+<li><p>However, for samples that are of low quality and have too few sequencing depth, their duplication rate can be super high. We recommend removing the duplicates for these samples.</p></li>
+<li><p>The following commands show how to check the duplication rate using <code>Picard</code>.</p></li>
+</ul>
+<pre class="bash"><code>##== linux command ==##
+## depending on how you load picard and your server environment, the picardCMD can be different. Adjust accordingly.
+picardCMD=&quot;java -jar picard.jar&quot;
+mkdir -p $projPath/alignment/rmDuplicate/picard_summary
+
+## Sort by coordinate
+$picardCMD SortSam I=$projPath/alignment/sam/${histName}_bowtie2.sam O=$projPath/alignment/sam/${histName}_bowtie2.sorted.sam SORT_ORDER=coordinate
+
+## mark duplicates
+$picardCMD MarkDuplicates I=$projPath/alignment/sam/${histName}_bowtie2.sorted.sam O=$projPath/alignment/removeDuplicate/${histName}_bowtie2.sorted.dupMarked.sam METRICS_FILE=$projPath/alignment/removeDuplicate/picard_summary/${histName}_picard.dupMark.txt
+
+## remove duplicates
+picardCMD MarkDuplicates I=$projPath/alignment/sam/${histName}_bowtie2.sorted.sam O=$projPath/alignment/removeDuplicate/${histName}_bowtie2.sorted.rmDup.sam REMOVE_DUPLICATES=true METRICS_FILE=$projPath/alignment/removeDuplicate/picard_summary/${histName}_picard.rmDup.txt</code></pre>
+<div id="duplication-rate" class="section level3">
+<h3>3.3.1 Duplication rate</h3>
+<p>First, we summarize the duplication rate.</p>
+<pre class="r"><code>##=== R command ===## 
+## Summarize the duplication information from the picard summary outputs.
+dupResult = c()
+for(hist in histList){
+  dupRes = read.table(paste0(projPath, &quot;/alignment/rmDuplicate/picard_summary/&quot;, hist, &quot;_picard.rmDup.txt&quot;), header = TRUE, fill = TRUE)
+  
+  histInfo = strsplit(hist, &quot;_&quot;)[[1]]
+  dupResult = data.frame(mappedN = dupRes$READ_PAIRS_EXAMINED[1] %&gt;% as.character %&gt;% as.numeric, dupRate = dupRes$PERCENT_DUPLICATION[1] %&gt;% as.character %&gt;% as.numeric, Histone = histInfo[1], Replicate = histInfo[2]) %&gt;% mutate(uniqN = mappedN * (1-dupRate))  %&gt;% rbind(dupResult, .)
+}
+
+## generate boxplot figure for the  duplication rate
+dupResult %&gt;% ggplot(aes(x = Histone, y = dupRate * 100, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;Duplication Rate (*100%)&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ul>
+<li>If you go back to the sequencing depth figure in section 1.1 and 1.3, you will find the negative correlation between the sequencing depth and the duplication rate. In other words, usually samples that have higher sequencing depth will have low duplication rate.</li>
+</ul>
+</div>
+<div id="unique-library-size" class="section level3">
+<h3>3.3.2 Unique library size</h3>
+<p>Next, we check the unique library size without duplications.</p>
+<pre class="r"><code>##=== R command ===## 
+dupResult %&gt;% ggplot(aes(x = Histone, y = uniqN, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;# of Unique Fragments&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ul>
+<li>We still have millions of unique fragments left.</li>
+</ul>
+</div>
+</div>
+<div id="assess-mapped-fragment-size-distribution-required" class="section level2">
+<h2>3.4. Assess mapped fragment size distribution [Required]</h2>
+<pre class="bash"><code>##== linux command ==##
+mkdir -p $projPath/alignment/sam/fragmentLen
+
+## Extract the 9th column from the alignment sam file which is the fragment length
+samtools view -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam | awk -F&#39;\t&#39; &#39;function abs(x){return ((x &lt; 0.0) ? -x : x)} {print abs($9)}&#39; | sort | uniq -c | awk -v OFS=&quot;\t&quot; &#39;{print $2, $1/2}&#39; &gt;$projPath/alignment/sam/fragmentLen/${histName}_fragmentLen.txt</code></pre>
+<pre class="r"><code>##=== R command ===## 
+## Collect the fragment size information
+fragLen = c()
+for(hist in histList){
+  histInfo = strsplit(hist, &quot;_&quot;)[[1]]
+  fragLen = read.table(paste0(projPath, &quot;/alignment/sam/fragmentLen/&quot;, hist, &quot;_fragmentLen.txt&quot;), header = FALSE) %&gt;% mutate(fragLen = V1 %&gt;% as.numeric, Weight = as.numeric(V2)/sum(as.numeric(V2)), Histone = histInfo[1], Replicate = histInfo[2], histInfo = hist) %&gt;% rbind(fragLen, .)
+  
+}
+
+## Generate the fragment size density plot (violin plot)
+fragLen %&gt;% ggplot(aes(x = histInfo, y = fragLen, weight = Weight, fill = Histone)) +
+    geom_violin(bw = 5) +
+    scale_y_continuous(breaks = seq(0, 800, 50)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ggpubr::rotate_x_text(angle = 20) +
+    ylab(&quot;Fragment Length&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ul>
+<li>There should be periodic peaking pattern of 200bp as a unit.</li>
+<li>These are fragments that are the size of nucleosomes, the expected result of targeting histone.</li>
+<li>The smaller fragments (50-100 bp) are not bad, they just result from tagmentation within nucleosomes.</li>
+</ul>
+</div>
+</div>
+<div id="iv.-alignment-results-filtering-and-file-format-conversion" class="section level1">
+<h1>IV. Alignment results filtering and file format conversion</h1>
+<p>This section is <strong>required</strong> in preparation for the peak calling and visualization where there are a few filtering and file format conversion that need to be done.</p>
+<pre class="bash"><code>##== linux command ==##
+## Filter and keep the mapped read pairs
+samtools view -bS -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam $projPath/alignment/bam/${histName}_bowtie2.mapped.bam
+
+## Convert into bed file format
+bedtools bamtobed -i $projPath/alignment/bam/${histName}_bowtie2.mapped.bam -bedpe $projPath/alignment/bed/${histName}_bowtie2.bed
+
+## Keep the read pairs that are on the same chromosome and fragment length less than 1000bp.
+awk &#39;$1==$4 &amp;&amp; $6-$2 &lt; 1000 {print $0}&#39; $projPath/alignment/bed/${histName}_bowtie2.bed $projPath/alignment/bed/${histName}_bowtie2.clean.bed
+
+## Only extract the fragment related columns
+cut -f 1,2,6 $projPath/alignment/bed/${histName}_bowtie2.clean.bed | sort -k1,1 -k2,2n -k3,3n  &gt;$projPath/alignment/bed/${histName}_bowtie2.fragments.bed</code></pre>
+</div>
+<div id="v.-spike-in-calibration" class="section level1">
+<h1>V. Spike-in calibration</h1>
+<p>This section is <strong>optional</strong> but <strong>recommended</strong> depending on your experimental protocol.</p>
+<div id="alignment-to-the-spike-in-genome-optionalrecommended" class="section level2">
+<h2>5.1 Alignment to the spike-in genome [optional/recommended]</h2>
+<ul>
+<li><p>To calibrate samples in a series for samples done in parallel using the same antibody we use counts of E. coli fragments carried over with the pA-Tn5 the same as one would for an ordinary spike-in.</p></li>
+<li><p>We align E. coli carry-over fragments to the NCBI Ecoli genome (Escherichia coli str. K12 substr. MG1655 U00096.3) with <code>--no-overlap --no-dovetail</code> options (```–end-to-end –very-sensitive –no-overlap –no-dovetail –no-mixed –no-discordant –phred33 -I 10 -X 700````) to avoid possible cross-mapping of the experimental genome to that of the carry-over E. coli DNA that is used for calibration.</p></li>
+</ul>
+<pre class="bash"><code>##== linux command ==##
+spikeInRef=&quot;/shared/ngs/illumina/henikoff/Bowtie2/Ecoli&quot;
+chromSize=&quot;/fh/fast/gottardo_r/yezheng_working/SupplementaryData/hg38/chromSize/hg38.chrom.size&quot;
+
+## bowtie2-build path/to/Ecoli/fasta/Ecoli.fa /path/to/bowtie2Index/Ecoli
+bowtie2 --end-to-end --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700 -p ${cores} -x ${spikeInRef} -1 ${projPath}/fastq/${histName}_R1.fastq.gz -2 ${projPath}/fastq/${histName}_R2.fastq.gz -S $projPath/alignment/sam/${histName}_bowtie2_spikeIn.sam &amp;&gt; $projPath/alignment/sam/bowtie2_summary/${histName}_bowtie2_spikeIn.txt
+
+seqDepthDouble=`samtools view -F 0x04 seqDepth=$((seqDepthDouble/2))
+echo $seqDepth &gt;$projPath/alignment/sam/bowtie2_summary/${histName}_bowtie2_spikeIn.seqDepth
+
+
+if [[ &quot;$seqDepth&quot; -gt &quot;1&quot; ]]; then
+    
+    mkdir -p $projPath/alignment/bedgraph
+
+    scale_factor=`echo &quot;10000 / $seqDepth&quot; | bc -l`
+    echo &quot;Scaling factor for $histName is: $scale_factor!&quot;
+    bedtools genomecov -bg -scale $scale_factor -i $projPath/alignment/bed/${histName}_bowtie2.fragments.bed -g $chromSize &gt; $projPath/alignment/bedgraph/${histName}_bowtie2.fragments.normalized.bedgraph
+    
+fi</code></pre>
+</div>
+<div id="spike-in-alignment-rate" class="section level2">
+<h2>5.2 Spike-in alignment rate</h2>
+<pre class="r"><code>##=== R command ===## 
+spikeAlign = c()
+for(hist in histList){
+  spikeRes = read.table(paste0(projPath, &quot;/alignment/sam/bowtie2_summary/&quot;, hist, &quot;_bowtie2_spikeIn.txt&quot;), header = FALSE, fill = TRUE)
+  alignRate = substr(spikeRes$V1[6], 1, nchar(as.character(spikeRes$V1[6]))-1)
+  histInfo = strsplit(hist, &quot;_&quot;)[[1]]
+  spikeAlign = data.frame(seqDepth = spikeRes$V1[1] %&gt;% as.character %&gt;% as.numeric, alignNum = spikeRes$V1[4] %&gt;% as.character %&gt;% as.numeric + spikeRes$V1[5] %&gt;% as.character %&gt;% as.numeric, alignRate = alignRate %&gt;% as.numeric, Histone = histInfo[1], Replicate = histInfo[2])  %&gt;% rbind(spikeAlign, .)
+}
+
+## Generate alignment rate boxplot
+spikeAlign %&gt;% ggplot(aes(x = Histone, y = alignRate, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;Spike-in Alignment Rate&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ul>
+<li>The percentage of reads mapped to E.coli depends on the number of cells and how broadly distributed the antibody epitope is. Based on our normal exploratory experiments, usually, this percentage range from 0.01% to 11.5%.</li>
+<li>Especially for IgG, this percentage is usually much higher (2%-11.5%) than the histone modification.</li>
+<li>For even wilder exploratory experiments, we found using a few thousand or even a few hundreds of cells, and this number can soar to 30% or even 70%. However, the percentage drops back to 4% using 65k cells.</li>
+</ul>
+</div>
+<div id="scaling-factor" class="section level2">
+<h2>5.3 Scaling factor</h2>
+<p>The scaling factor is defined to be</p>
+<p>Scaling_factor = Scale multiplier/ (Total # of fragments mapped to spike-in genome)</p>
+<pre class="r"><code>##=== R command ===## 
+scaleFactor = c()
+multiplier = 10000
+for(hist in histList){
+  spikeDepth = read.table(paste0(projPath, &quot;/alignment/sam/bowtie2_summary/&quot;, hist, &quot;_bowtie2_spikeIn.seqDepth&quot;), header = FALSE, fill = TRUE)$V1[1]
+  
+  histInfo = strsplit(hist, &quot;_&quot;)[[1]]
+  scaleFactor = data.frame(scaleFactor = multiplier/spikeDepth, Histone = histInfo[1], Replicate = histInfo[2])  %&gt;% rbind(scaleFactor, .)
+}
+
+## Generate sequencing depth boxplot
+scaleFactor %&gt;% ggplot(aes(x = Histone, y = scaleFactor, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;Spike-in Scalling Factor&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ul>
+<li><p>There is actually no universal scale factor that can be used on different samples. Instead, the key idea of calibration is</p>
+<p>(primary_genome_mapped_count_at_bp) * Scaling_factor =</p>
+<p>(primary_genome_mapped_count_at_bp) * Scale multiplier / (spike-in_genome_total_of_mapped_fragments)</p></li>
+<li><p>The underlying assumption is that the primary # genome to spike-in genome ratio per cell is expected to be the same for all samples that use the same number of cells in an experiment comparing treatment.</p></li>
+<li><p>The “scale multiplier” in the above formula can be an arbitrary multiplier (e.g., 10000) to avoid small fractions.</p></li>
+<li><p>The drop of file size should be expected as the input files are the alignment for all the fragments but the output is genome coverage which is like a summary of the fragment alignment results. However, it won’t hurt to carefully check the output file.</p></li>
+</ul>
+</div>
+<div id="total-number-of-fragments-after-normaliztion-seqdepth" class="section level2">
+<h2>5.4 Total number of fragments after normaliztion (seqDepth)</h2>
+<pre class="r"><code>##=== R command ===## 
+normDepth = inner_join(scaleFactor, alignResult, by = c(&quot;Histone&quot;, &quot;Replicate&quot;)) %&gt;% mutate(normDepth = alignNum * scaleFactor)
+
+normDepth %&gt;% ggplot(aes(x = Histone, y = normDepth, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;Total number of fragments after normalization&quot;) +
+    xlab(&quot;&quot;) + 
+    coord_cartesian(ylim = c(1000000, 130000000))</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="chipseqspikeinfree-for-experiments-without-spike-ins-optional" class="section level2">
+<h2>5.5 ChIPseqSpikeInFree for experiments without spike-ins [Optional]</h2>
+<p><a href="https://academic.oup.com/bioinformatics/article/36/4/1270/5578481">ChIPseqSpikeInFree: a ChIP-seq normalization approach to reveal global changes in histone modifications without spike-in</a> is a novel ChIP-seq normalization method to effectively determine scaling factors for samples across various conditions and treatments, which does not rely on exogenous spike-in chromatin or peak detection to reveal global changes in histone modification occupancy. The installation details can be found on <a href="https://github.com/stjude/ChIPseqSpikeInFree">github</a>.</p>
+<pre class="r"><code>##=== R command ===## 
+library(&quot;ChIPseqSpikeInFree&quot;)
+
+bamDir = paste0(projPath, &quot;/alignment/bam&quot;)
+metaData = c()
+for(hist in histList){
+  histInfo = strsplit(hist, &quot;_&quot;)[[1]] 
+
+  metaData = data.frame(ID = paste0(hist, &quot;_bowtie2.mapped.bam&quot;), ANTIBODY = histInfo[1], GROUP = histInfo[2]) %&gt;% rbind(metaData, .)
+  
+}
+write.table(metaData, file = paste0(projPath, &quot;/alignment/ChIPseqSpikeInFree/metaData.txt&quot;), row.names = FALSE, quote = FALSE, sep = &quot;\t&quot;)
+
+metaFile = paste0(projPath, &quot;/alignment/ChIPseqSpikeInFree/metaData.txt&quot;)
+bams = paste0(projPath, &quot;/alignment/bam/&quot;, metaData$ID)
+ChIPseqSpikeInFree(bamFiles = bams, chromFile = &quot;hg38&quot;, metaFile = metaFile, prefix = paste0(projPath, &quot;/alignment/ChIPseqSpikeInFree/SpikeInFree_results&quot;))</code></pre>
+<ul>
+<li><p><a href="https://github.com/stjude/ChIPseqSpikeInFree#interpretation-of-scaling-factor-table">Interpretation of the ChIPseqSpikeInFree output.</a></p></li>
+<li><p><a href="https://github.com/stjude/ChIPseqSpikeInFree#how-to-use-chipseqspikein-scaling-factor">How to use ChIPseqSpikeInFree scaling factor.</a></p></li>
+</ul>
+</div>
+</div>
+<div id="vi.-peak-calling" class="section level1">
+<h1>VI. Peak calling</h1>
+<div id="seacr" class="section level2">
+<h2>6.1. SEACR</h2>
+<p>The usage manual of SEACR can be found <a href="https://github.com/FredHutch/SEACR/">here</a>. We have calibrated the fragment frequency with respect to the spike-in, therefore for field 3, we can set the normalization option to be “non”. Otherwise, “norm” is recommended.</p>
+<pre class="bash"><code>##== linux command ==##
+seacr=&quot;/fh/fast/gottardo_r/yezheng_working/Software/SEACR/SEACR_1.3.sh&quot;
+histControl=$2
+mkdir -p $projPath/peakCalling/SEACR
+
+bash $seacr $projPath/alignment/bedgraph/${histName}_bowtie2.fragments.normalized.bedgraph \
+     $projPath/alignment/bedgraph/${histControl}_bowtie2.fragments.normalized.bedgraph \
+     non stringent $projPath/peakCalling/SEACR/${histName}_seacr_control.peaks
+
+bash $seacr $projPath/alignment/bedgraph/${histName}_bowtie2.fragments.normalized.bedgraph 0.01 non stringent $projPath/peakCalling/SEACR/${histName}_seacr_top0.01.peaks</code></pre>
+<div id="number-of-peaks-called" class="section level3">
+<h3>6.1.1 Number of peaks called</h3>
+<pre class="r"><code>##=== R command ===## 
+peakN = c()
+peakWidth = c()
+peakType = c(&quot;control&quot;, &quot;top0.01&quot;)
+for(hist in histList){
+  histInfo = strsplit(hist, &quot;_&quot;)[[1]]
+  if(histInfo[1] != &quot;IgG&quot;){
+    for(type in peakType){
+      peakInfo = read.table(paste0(projPath, &quot;/peakCalling/SEACR/&quot;, hist, &quot;_seacr_&quot;, type, &quot;.peaks.stringent.bed&quot;), header = FALSE, fill = TRUE)  %&gt;% mutate(width = abs(V3-V2))
+      peakN = data.frame(peakN = nrow(peakInfo), peakType = type, Histone = histInfo[1], Replicate = histInfo[2]) %&gt;% rbind(peakN, .)
+      peakWidth = data.frame(width = peakInfo$width, peakType = type, Histone = histInfo[1], Replicate = histInfo[2])  %&gt;% rbind(peakWidth, .)
+    }
+  }
+}
+
+peakN %&gt;% ggplot(aes(x = Histone, y = peakN, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    facet_grid(~peakType) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;Number of Peaks&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-24-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="distribution-of-the-peak-length" class="section level3">
+<h3>6.1.2 Distribution of the peak length</h3>
+<pre class="r"><code>##=== R command ===## 
+peakWidth %&gt;% ggplot(aes(x = Histone, y = width, fill = Histone)) +
+    geom_violin() +
+    facet_grid(Replicate~peakType) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;Width of Peaks&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-25-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>##=== R command ===## 
+peakWidth %&gt;% ggplot(aes(x = Histone, y = width, fill = Histone)) +
+    geom_violin() +
+    facet_grid(Replicate~peakType) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;Width of Peaks&quot;) +
+    xlab(&quot;&quot;) +
+    coord_cartesian(ylim = c(0, 25000))</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="reproducibility-of-the-peak-across-biological-replicates" class="section level3">
+<h3>6.1.3 Reproducibility of the peak across biological replicates</h3>
+<pre class="r"><code>##=== R command ===## 
+histL = c(&quot;K27me3&quot;, &quot;K4me3&quot;)
+repL = paste0(&quot;rep&quot;, 1:2)
+peakType = c(&quot;control&quot;, &quot;top0.01&quot;)
+peakOverlap = c()
+for(type in peakType){
+  for(hist in histL){
+    overlap.gr = GRanges()
+    for(rep in repL){
+      peakInfo = read.table(paste0(projPath, &quot;/peakCalling/SEACR/&quot;, hist, &quot;_&quot;, rep, &quot;_seacr_&quot;, type, &quot;.peaks.stringent.bed&quot;), header = FALSE, fill = TRUE)
+      peakInfo.gr = GRanges(peakInfo$V1, IRanges(start = peakInfo$V2, end = peakInfo$V3), strand = &quot;*&quot;)
+      if(length(overlap.gr) &gt;0){
+        overlap.gr = overlap.gr[findOverlaps(overlap.gr, peakInfo.gr)@from]
+      }else{
+        overlap.gr = peakInfo.gr
+        
+      }
+    }
+    peakOverlap = data.frame(peakReprod = length(overlap.gr), Histone = hist, peakType = type) %&gt;% rbind(peakOverlap, .)
+  }
+}
+
+peakReprod = left_join(peakN, peakOverlap, by = c(&quot;Histone&quot;, &quot;peakType&quot;)) %&gt;% mutate(peakReprodRate = peakReprod/peakN * 100)
+
+peakReprod %&gt;% ggplot(aes(x = Histone, y = peakReprodRate, fill = Histone, label = round(peakReprodRate, 2))) +
+    geom_bar(stat = &quot;identity&quot;) +
+    geom_text(vjust = 0.1) +
+    facet_grid(Replicate~peakType) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;% of Peaks Reproduced across Biological Replicate&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="fragment-proportion-in-peaks-regions-frips." class="section level3">
+<h3>6.1.4 FRagment proportion in Peaks regions (FRiPs).</h3>
+<ul>
+<li>We utilize the SEACR peaks contrasting with IgG controls for illustration.</li>
+</ul>
+<pre class="r"><code>##=== R command ===## 
+library(chromVAR)
+
+bamDir = paste0(projPath, &quot;/alignment/bam&quot;)
+inPeakData = c()
+## overlap with bam file to get count
+for(hist in histL){
+  for(rep in repL){
+    peakRes = read.table(paste0(projPath, &quot;/peakCalling/SEACR/&quot;, hist, &quot;_&quot;, rep, &quot;_seacr_control.peaks.stringent.bed&quot;), header = FALSE, fill = TRUE)
+    peak.gr = GRanges(seqnames = peakRes$V1, IRanges(start = peakRes$V2, end = peakRes$V3), strand = &quot;*&quot;)
+    bamFile = paste0(bamDir, &quot;/&quot;, hist, &quot;_&quot;, rep, &quot;_bowtie2.mapped.bam&quot;)
+    fragment_counts &lt;- getCounts(bamFile, peak.gr, paired = TRUE, by_rg = FALSE, format = &quot;bam&quot;)
+    inPeakN = counts(fragment_counts)[,1] %&gt;% sum
+    inPeakData = rbind(inPeakData, data.frame(inPeakN = inPeakN, Histone = hist, Replicate = rep))
+  }
+}
+
+frip = left_join(inPeakData, alignResult, by = c(&quot;Histone&quot;, &quot;Replicate&quot;)) %&gt;% mutate(frip = inPeakN/alignNum * 100)
+
+frip %&gt;% ggplot(aes(x = Histone, y = frip, fill = Histone, label = round(frip, 2))) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = &quot;magma&quot;, alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab(&quot;% of Fragments in Peaks&quot;) +
+    xlab(&quot;&quot;)</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="other-peak-calling-methods." class="section level2">
+<h2>6.2. Other peak calling methods.</h2>
+<div id="macs2-model-based-analysis-of-chip-seq-macs.-installation-details-can-be-found-here." class="section level3">
+<h3>6.2.1 MACS2: <a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2008-9-9-r137">Model-based Analysis of ChIP-Seq (MACS)</a>. Installation details can be found <a href="https://github.com/taoliu/MACS/wiki">here</a>.</h3>
+<pre class="bash"><code>##== linux command ==##
+histName=&quot;K27me3&quot;
+controlName=&quot;IgG&quot;
+
+mkdir -p $projPath/peakCalling
+macs2 callpeak -t ${projPath}/alignment/bam/${histName}_rep1_bowtie2.mapped.bam \
+      -c ${projPath}/alignment/bam/${controlName}_rep1_bowtie2.mapped.bam \
+      -g hs -f BAMPE -n macs2_peak_q0.1 --outdir $projPath/peakCalling/MACS2 -q 0.1 --keep-dup all 2&gt;${projPath}/peakCalling/MACS2/macs2Peak_summary.txt</code></pre>
+</div>
+<div id="other-peak-calling-methods-that-are-widely-used-for-chip-seq-data-may-also-be-utilized." class="section level3">
+<h3>6.2.2 Other peak calling methods that are widely used for ChIP-seq data may also be utilized.</h3>
+<ul>
+<li><p>dPeak: <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003246">dPeak: High Resolution Identification of Transcription Factor Binding Sites from PET and SET ChIP-Seq Data</a></p></li>
+<li><p>MOSAiCS: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4608541/">A Statistical Framework for the Analysis of ChIP-Seq Data</a></p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="vii.-visualization" class="section level1">
+<h1>VII. Visualization</h1>
+<ul>
+<li><p><a href="http://software.broadinstitute.org/software/igv/home">Integrative Genomic Viewer</a> provides web app version and local desktop version. Easy to use.</p></li>
+<li><p><a href="https://genome.ucsc.edu/">UCSC Genome Browser</a> provides the most comprehensive supplementary genome information.</p></li>
+</ul>
+<div id="browser-display-of-bedgraph-files-after-spike-in-calibration." class="section level2">
+<h2>7.1. Browser display of bedgraph files after spike-in calibration.</h2>
+<div class="figure">
+<img src="figures/chr7.png" alt="Figure 4. IgV Web Visualization around region chr7:131,000,000-134,000,000" />
+<p class="caption"><strong>Figure 4. IgV Web Visualization around region chr7:131,000,000-134,000,000</strong></p>
+</div>
+<ul>
+<li>Check pericentromeric regions that contain lots of repeats are a good place to look since signal will naturally be enriched there for all antibody and IgG data.</li>
+</ul>
+<div class="figure">
+<img src="figures/chr1_center.png" alt="Figure 5. IgV Web Visualization around chr1 pericentromeric region" />
+<p class="caption"><strong>Figure 5. IgV Web Visualization around chr1 pericentromeric region</strong></p>
+</div>
+</div>
+<div id="heatmap-visualization-on-specific-regions" class="section level2">
+<h2>7.2. Heatmap visualization on specific regions</h2>
+<p>We will use the <code>computeMatrix</code> and <code>plotHeatmap</code> functions from <a href="https://deeptools.readthedocs.io/en/develop/">deepTools</a> to generate the heatmap.</p>
+<pre class="bash"><code>##== linux command ==##
+mkdir -p $projPath/alignment/bigwig                                                                                                                                        
+samtools sort -o $projPath/alignment/bam/${histName}.sorted.bam $projPath/alignment/bam/${histName}_bowtie2.mapped.bam                                                     
+samtools index $projPath/alignment/bam/${histName}.sorted.bam                                                                                                              
+bamCoverage -b $projPath/alignment/bam/${histName}.sorted.bam -o $projPath/alignment/bigwig/${histName}_raw.bw                                                             
+</code></pre>
+<div id="heatmap-over-transcripts" class="section level3">
+<h3>7.2.1 Heatmap over transcripts</h3>
+<pre class="bash"><code>##== linux command ==##
+cores=8
+computeMatrix scale-regions -S $projPath/alignment/bigwig/K27me3_rep1_raw.bw \
+                               $projPath/alignment/bigwig/K27me3_rep2_raw.bw \
+                               $projPath/alignment/bigwig/K4me3_rep1_raw.bw \
+                               $projPath/alignment/bigwig/K4me3_rep2_raw.bw \
+                              -R $projPath/data/hg38_gene/hg38_gene.tsv \
+                              --beforeRegionStartLength 3000 \
+                              --regionBodyLength 5000 \
+                              --afterRegionStartLength 3000 \
+                              --skipZeros -o $projPath/data/hg38_gene/matrix_gene.mat.gz -p $cores
+
+plotHeatmap -m $projPath/data/hg38_gene/matrix_gene.mat.gz -out $projPath/data/hg38_gene/Histone_gene.png --sortUsing sum
+</code></pre>
+<p><img src="figures/Histone_gene.png" alt="Figure 6. Heatmap of histone enrichment around genes" /> ### 7.2.2. Heatmap on CUT&amp;Tag peaks</p>
+<pre class="bash"><code>##== linux command ==##
+computeMatrix scale-regions -S $projPath/alignment/bigwig/${histName}_raw.bw \
+              -R $projPath/peakCalling/SEACR/${histName}_seacr_control.peaks.stringent.bed \
+              --skipZeros -o $projPath/peakCalling/SEACR/${histName}_SEACR.mat.gz -p $cores
+
+plotHeatmap -m $projPath/peakCalling/SEACR/${histName}_SEACR.mat.gz -out $projPath/peakCalling/SEACR/${histName}_SEACR_heatmap.png --sortUsing sum --startLabel &quot;Peak Start&quot; -\
+-endLabel &quot;Peak End&quot; --xAxisLabel &quot;&quot; --regionsLabel &quot;Peaks&quot; --samplesLabel ${histName}</code></pre>
+<div class="figure">
+<img src="figures/Histone_peak.png" alt="Figure 7. Heatmap of histone enrichment in peaks" />
+<p class="caption"><strong>Figure 7. Heatmap of histone enrichment in peaks</strong></p>
+</div>
+</div>
+</div>
+</div>
+<div id="viii.-differential-analysis" class="section level1">
+<h1>VIII. Differential analysis</h1>
+<ul>
+<li>DESeq2: <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8">Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2</a></li>
+</ul>
+<p>Estimate variance-mean dependence in count data from high-throughput sequencing assays and test for differential expression based on a model using the negative binomial distribution.</p>
+<ul>
+<li>Limma: <a href="https://academic.oup.com/nar/article/43/7/e47/2414268">limma powers differential expression analyses for RNA-sequencing and microarray studies</a></li>
+</ul>
+<p>Limma is an R package for the analysis of gene expression microarray data, especially the use of linear models for analysing designed experiments and the assessment of differential expression. Limma provides the ability to analyse comparisons between many RNA targets simultaneously in arbitrary complicated designed experiments. Empirical Bayesian methods are used to provide stable results even when the number of arrays is small. Limma can be extended to study differential fragment enrichment analysis within peak regions. Notably, limma can deal with both fixed effect model and random effect model.</p>
+<ul>
+<li>edgeR: <a href="https://academic.oup.com/nar/article/40/10/4288/2411520">Differential Expression Analysis of Multifactor RNA-Seq Experiments With Respect to Biological Variation</a></li>
+</ul>
+<p>Differential expression analysis of RNA-seq expression profiles with biological replication. Implements a range of statistical methodology based on the negative binomial distributions, including empirical Bayes estimation, exact tests, generalized linear models and quasi-likelihood tests. As well as RNA-seq, it be applied to differential signal analysis of other types of genomic data that produce read counts, including ChIP-seq, ATAC-seq, Bisulfite-seq, SAGE and CAGE. edgeR can deal with multifactor problem.</p>
+<div id="create-the-peak-x-sample-matrix." class="section level2">
+<h2>8.1. Create the peak x sample matrix.</h2>
+<p>Usually, the differential tests compare two or more conditions of the same histone modification. In this tutorial, limited by the demonstration data, we will illustrate the differential detection by comparing two replicates of H3K27me3 and two replicates of H3K4me3. We will use DESeq2 (<a href="http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#why-un-normalized-counts">complete tutorial</a>) as illustration.</p>
+<div id="create-a-master-peak-list-merging-all-the-peaks-called-for-each-sample." class="section level3">
+<h3>8.1.1 Create a master peak list merging all the peaks called for each sample.</h3>
+<pre class="r"><code>##=== R command ===## 
+mPeak = GRanges()
+## overlap with bam file to get count
+for(hist in histL){
+  for(rep in repL){
+    peakRes = read.table(paste0(projPath, &quot;/peakCalling/SEACR/&quot;, hist, &quot;_&quot;, rep, &quot;_seacr_control.peaks.stringent.bed&quot;), header = FALSE, fill = TRUE)
+    mPeak = GRanges(seqnames = peakRes$V1, IRanges(start = peakRes$V2, end = peakRes$V3), strand = &quot;*&quot;) %&gt;% append(mPeak, .)
+  }
+}
+masterPeak = reduce(mPeak)</code></pre>
+</div>
+<div id="get-the-fragment-counts-for-each-peak-in-the-master-peak-list." class="section level3">
+<h3>8.1.2 Get the fragment counts for each peak in the master peak list.</h3>
+<pre class="r"><code>##=== R command ===## 
+library(DESeq2)
+bamDir = paste0(projPath, &quot;/alignment/bam&quot;)
+countMat = matrix(NA, length(masterPeak), length(histL)*length(repL))
+## overlap with bam file to get count
+i = 1
+for(hist in histL){
+  for(rep in repL){
+    
+    bamFile = paste0(bamDir, &quot;/&quot;, hist, &quot;_&quot;, rep, &quot;_bowtie2.mapped.bam&quot;)
+    fragment_counts &lt;- getCounts(bamFile, masterPeak, paired = TRUE, by_rg = FALSE, format = &quot;bam&quot;)
+    countMat[, i] = counts(fragment_counts)[,1]
+    i = i + 1
+  }
+}
+colnames(countMat) = paste(rep(histL, 2), rep(repL, each = 2), sep = &quot;_&quot;)</code></pre>
+</div>
+</div>
+<div id="sequencing-depth-normalization-and-differential-enriched-peaks-detection" class="section level2">
+<h2>8.2. Sequencing depth normalization and differential enriched peaks detection</h2>
+<pre class="r"><code>##=== R command ===## 
+selectR = which(rowSums(countMat) &gt; 5) ## remove low count genes
+dataS = countMat[selectR,]
+condition = factor(rep(histL, each = length(repL)))
+dds = DESeqDataSetFromMatrix(countData = dataS,
+                              colData = DataFrame(condition),
+                              design = ~ condition)
+DDS = DESeq(dds)
+normDDS = counts(DDS, normalized = TRUE) ## normalization with respect to the sequencing depth
+colnames(normDDS) = paste0(colnames(normDDS), &quot;_norm&quot;)
+res = results(DDS, independentFiltering = FALSE, altHypothesis = &quot;greaterAbs&quot;)
+
+countMatDiff = cbind(dataS, normDDS, res)
+head(countMatDiff)</code></pre>
+<pre><code>DataFrame with 6 rows and 14 columns
+  K27me3_rep1 K4me3_rep1 K27me3_rep2 K4me3_rep2  K27me3_rep1_norm
+    &lt;numeric&gt;  &lt;numeric&gt;   &lt;numeric&gt;  &lt;numeric&gt;         &lt;numeric&gt;
+1           1          0         242        182 0.124345459941495
+2           0          0         175         88                 0
+3           0          0         274        194                 0
+4         212        130         354        637  26.3612375075969
+5           0          2         180        174                 0
+6           1          0         193        186 0.124345459941495
+    K4me3_rep1_norm K27me3_rep2_norm  K4me3_rep2_norm         baseMean
+          &lt;numeric&gt;        &lt;numeric&gt;        &lt;numeric&gt;        &lt;numeric&gt;
+1                 0   1642.098979559  860.62486419289 625.712047302957
+2                 0 1187.46827034225 416.126307961397 400.898644575912
+3                 0 1859.23603470729  917.36936073308 694.151348860094
+4  29.5546421781954 2402.07867257804 3012.18702467511 1367.54539423474
+5 0.454686802741468 1221.39593520917 822.795199832763 511.161455461169
+6                 0 1309.60786386317 879.539696372953 547.317976424015
+    log2FoldChange            lfcSE             stat               pvalue
+         &lt;numeric&gt;        &lt;numeric&gt;        &lt;numeric&gt;            &lt;numeric&gt;
+1 13.9001328992164 1.46237329851921 9.50518784313936  1.9968728862444e-21
+2 14.6578324953342 1.58571426872719 9.24367824923438 2.38165977165095e-20
+3 15.4521653584048 1.57311982807133 9.82262449603056 8.99701430682874e-23
+4 6.59884758504177 0.54558731844186 12.0949431227386 1.12320018631658e-33
+5 12.5701262927903 1.12748347918641 11.1488341291359 7.25507086647784e-29
+6 13.7045749300893 1.42987365830219 9.58446562779669  9.2937484305191e-22
+                  padj
+             &lt;numeric&gt;
+1 1.76349075171341e-20
+2 1.74850821274181e-19
+3 1.35404803928629e-21
+4 1.47675167643583e-31
+5  3.8309051756058e-27
+6 9.00551358394595e-21</code></pre>
+<ul>
+<li><p>DESeq2 requires the input matrix should be un-normalized counts or estimated counts of sequencing reads.</p></li>
+<li><p>DESeq2 model internally corrects for library size.</p></li>
+<li><code>countMatDiff</code> summarizes the differential analysis results:
+<ul>
+<li>First 4 columns: raw reads counts after filtering the peak regions with low counts</li>
+<li>Second 4 columns: normalized read counts eliminating library size difference.</li>
+<li>Remaining columns: differential detection results.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<div class="figure">
+<img src="figures/CUTTag_Diagram.png" alt="Figure 8. CUT&amp;Tag data processing and analysis." />
+<p class="caption"><strong>Figure 8. CUT&amp;Tag data processing and analysis.</strong></p>
+</div>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ul>
+<li>Citing this tutorial</li>
+</ul>
+<pre><code>Kaya-Okur HS, Wu SJ, Codomo CA, Pledger ES, Bryson TD, Henikoff JG, Ahmad K, Henikoff S: CUT&amp;Tag for efficient epigenomic profiling of small samples and single cells. Nature Communications 2019 10:1930 (PMID:31036827).</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.2 (2019-12-12)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 14.04.5 LTS
+
+Matrix products: default
+BLAS/LAPACK: /app/easybuild/software/OpenBLAS/0.2.18-GCC-5.4.0-2.26-LAPACK-3.6.1/lib/libopenblas_prescottp-r0.2.18.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] parallel  stats4    stats     graphics  grDevices utils     datasets 
+[8] methods   base     
+
+other attached packages:
+ [1] DESeq2_1.26.0               SummarizedExperiment_1.16.1
+ [3] DelayedArray_0.12.3         BiocParallel_1.20.1        
+ [5] matrixStats_0.55.0          Biobase_2.46.0             
+ [7] chromVAR_1.8.0              GenomicRanges_1.38.0       
+ [9] GenomeInfoDb_1.22.1         IRanges_2.20.2             
+[11] S4Vectors_0.24.4            BiocGenerics_0.32.0        
+[13] viridis_0.5.1               viridisLite_0.3.0          
+[15] ggplot2_3.3.0               stringr_1.4.0              
+[17] dplyr_0.8.5                 workflowr_1.6.2            
+
+loaded via a namespace (and not attached):
+  [1] readxl_1.3.1                backports_1.1.5            
+  [3] Hmisc_4.3-0                 VGAM_1.1-2                 
+  [5] plyr_1.8.5                  lazyeval_0.2.2             
+  [7] splines_3.6.2               TFBSTools_1.24.0           
+  [9] digest_0.6.23               htmltools_0.4.0            
+ [11] GO.db_3.10.0                magrittr_1.5               
+ [13] checkmate_1.9.4             memoise_1.1.0              
+ [15] BSgenome_1.54.0             cluster_2.1.0              
+ [17] openxlsx_4.1.4              Biostrings_2.54.0          
+ [19] readr_1.3.1                 annotate_1.64.0            
+ [21] R.utils_2.9.2               colorspace_1.4-1           
+ [23] blob_1.2.0                  haven_2.2.0                
+ [25] xfun_0.11                   crayon_1.3.4               
+ [27] RCurl_1.95-4.12             jsonlite_1.6               
+ [29] genefilter_1.68.0           TFMPvalue_0.0.8            
+ [31] survival_3.1-8              glue_1.3.1                 
+ [33] gtable_0.3.0                zlibbioc_1.32.0            
+ [35] XVector_0.26.0              car_3.0-5                  
+ [37] abind_1.4-5                 scales_1.1.0               
+ [39] DBI_1.0.0                   rstatix_0.5.0              
+ [41] miniUI_0.1.1.1              Rcpp_1.0.3                 
+ [43] xtable_1.8-4                htmlTable_1.13.3           
+ [45] foreign_0.8-72              bit_1.1-14                 
+ [47] Formula_1.2-3               DT_0.10                    
+ [49] htmlwidgets_1.5.1           httr_1.4.1                 
+ [51] RColorBrewer_1.1-2          acepack_1.4.1              
+ [53] pkgconfig_2.0.3             XML_3.98-1.20              
+ [55] R.methodsS3_1.7.1           farver_2.0.1               
+ [57] nnet_7.3-12                 locfit_1.5-9.1             
+ [59] tidyselect_1.0.0            labeling_0.3               
+ [61] rlang_0.4.6                 reshape2_1.4.3             
+ [63] later_1.0.0                 AnnotationDbi_1.48.0       
+ [65] cellranger_1.1.0            munsell_0.5.0              
+ [67] tools_3.6.2                 DirichletMultinomial_1.28.0
+ [69] generics_0.0.2              RSQLite_2.1.4              
+ [71] broom_0.5.2                 evaluate_0.14              
+ [73] fastmap_1.0.1               yaml_2.2.0                 
+ [75] knitr_1.26                  bit64_0.9-7                
+ [77] fs_1.3.1                    zip_2.0.4                  
+ [79] caTools_1.17.1.3            purrr_0.3.3                
+ [81] KEGGREST_1.26.1             nlme_3.1-143               
+ [83] whisker_0.4                 mime_0.7                   
+ [85] R.oo_1.23.0                 poweRlaw_0.70.6            
+ [87] pracma_2.2.5                compiler_3.6.2             
+ [89] rstudioapi_0.10             plotly_4.9.1               
+ [91] curl_4.3                    png_0.1-7                  
+ [93] ggsignif_0.6.0              tibble_2.1.3               
+ [95] geneplotter_1.64.0          stringi_1.4.3              
+ [97] highr_0.8                   forcats_0.4.0              
+ [99] lattice_0.20-38             CNEr_1.22.0                
+[101] Matrix_1.2-18               vctrs_0.2.4                
+[103] pillar_1.4.2                lifecycle_0.1.0            
+[105] data.table_1.12.8           bitops_1.0-6               
+[107] httpuv_1.5.2                rtracklayer_1.46.0         
+[109] R6_2.4.1                    latticeExtra_0.6-28        
+[111] promises_1.1.0              gridExtra_2.3              
+[113] rio_0.5.16                  gtools_3.8.1               
+[115] assertthat_0.2.1            seqLogo_1.52.0             
+[117] rprojroot_1.3-2             withr_2.1.2                
+[119] GenomicAlignments_1.22.1    Rsamtools_2.2.3            
+[121] GenomeInfoDbData_1.2.2      hms_0.5.2                  
+[123] grid_3.6.2                  rpart_4.1-15               
+[125] tidyr_1.0.0                 rmarkdown_1.18             
+[127] carData_3.0-3               Cairo_1.5-10               
+[129] git2r_0.26.1                ggpubr_0.3.0               
+[131] shiny_1.4.0                 base64enc_0.1-3            </code></pre>
+</div>
+</div>
 
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
@@ -493,6 +1654,8 @@ footer is added to webpages before the MathJax javascript. -->
 </script>
 
 
+</div>
+</div>
 
 </div>
 
@@ -524,7 +1687,38 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
