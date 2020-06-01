@@ -12,7 +12,7 @@ navbar:
   right:
   - icon: fa-github
     text: Source code
-    href: https://github.com/yezhengSTAT/CUTTag_tutorial
+    href: https://github.com/myname/CUTTag_tutorial
 output:
   workflowr::wflow_html:
     toc: yes
