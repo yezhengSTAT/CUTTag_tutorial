@@ -40,7 +40,7 @@ editor_options:
 
 *File creation: March 13, 2020*  
 
-*Final Update: June 1, 2020* 
+*Final Update: June 7, 2020* 
 
 **Approximate time: 60 - 120 minutes**
 
@@ -73,8 +73,8 @@ With all the differences between ChIP-seq and CUT&Tag data, we launched this tut
 
 ## 1.2. Objectives
 
-This tutorial is designed for processing and analyzing CUT&Tag data following the [Bench top CUT&Tag V.3 protocol](https://www.protocols.io/view/bench-top-cut-amp-tag-bcuhiwt6/abstract), an enzyme-tethering strategy that provides efficient high-resolution sequencing libraries for profiling diverse chromatin components. 
- 
+This tutorial is designed for processing and analyzing CUT&Tag data following the [Bench top CUT&Tag V.3 protocol](https://www.protocols.io/view/bench-top-cut-amp-tag-bcuhiwt6/abstract), an enzyme-tethering strategy that provides efficient high-resolution sequencing libraries for profiling diverse chromatin components. Notably, the illustration data used in this tutorial is histone modification data but CUT&Tag is not limited to histone modification, but generally applicable, for example, to non-histone proteins complexes and transcription factors. The data processing and analysis in this tutorial is broadly applicable to protein epitopes and tags.
+
 ## 1.3. Requirements
 
 - Linux system
@@ -103,44 +103,42 @@ This tutorial is designed for processing and analyzing CUT&Tag data following th
 
 - deepTools (version >= 2.0)
  
-## 1.4. Data
+## 1.4. Data downloading
 
-In this tutorial, we use data from Kaya-Okur et al. (2020).
-
-- H3K27me3: 
-  - SH_Hs_K27m3_NX_0918 as replicate 1
-  - SH_Hs_K27m3_Xpc_0107 as replicate 2
-
-- H3K4me3:
-  - SH_Hs_K4m3_NX_0918 as replicate 1
-  - SH_Hs_K4m3_Xpc_0107 as replicate 2
-
-- IgG:
-  - SH_Hs_IgG_o_2kA_0919 as replicate 1
-  - SH_Hs_IgG_n_6kA_0918 as replicate 2
-
-
-
-## 1.5. Download the data
-
-We will do the data downloading, pre-processing and processing on each histone sample respectively. In this tutorial, we will use H3K27me3 replicate 1 as the illustration.
-
-First, we need to denote the histone name and project path.
+In this tutorial, we use data from Kaya-Okur et al. (2020). The 
 
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
-histName="K27me3_rep1"
+## specify the path to this tutorial/project
 projPath="/path/to/project/where/data/and/results/are/saved"
 ```
 
 
-Data were downloaded from ```http://heniweb.fhcrc.org/data/hs20190927_SH.html```.
 
+- H3K27me3: 
+  - GSE145187: SH_Hs_K27m3_NX_0918 as replicate 1
+  - GSE145187: SH_Hs_K27m3_Xpc_0107 as replicate 2
+
+- H3K4me3:
+  - GSE145187: SH_Hs_K4m3_NX_0918 as replicate 1
+  - GSE145187: SH_Hs_K4m3_Xpc_0107 as replicate 2
+
+- IgG:
+  - GSE145187: SH_Hs_IgG_o_2kA_0919 as replicate 1
+  
+  
+  - GSM3680227 as replicate 2
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
-mkdir -p $projPath/data
-wget -P $projPath/data path/to/open/source/data
+wget -O $projPath/data/IgG_rep2/IgG_rep2_R1_001.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR875/001/SRR8754611/SRR8754611_1.fastq.gz
+
+wget -O $projPath/data/IgG_rep2/IgG_rep2_R2_001.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR875/001/SRR8754611/SRR8754611_2.fastq.gz
+
+wget -O $projPath/data/IgG_rep2/IgG_rep2_R1_002.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR875/002/SRR8754612/SRR8754612_1.fastq.gz
+
+wget -O $projPath/data/IgG_rep2/IgG_rep2_R2_002.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR875/002/SRR8754612/SRR8754612_2.fastq.gz
 ```
+
 
 # II. Data Pre-processing
 
@@ -148,42 +146,12 @@ wget -P $projPath/data path/to/open/source/data
 
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
+histName="K27me3"
 mkdir -p ${projPath}/fastq
 cat ${projPath}/data/${histName}/*_R1_*.fastq.gz >${projPath}/fastq/${histName}_R1.fastq.gz
 cat ${projPath}/data/${histName}/*_R2_*.fastq.gz >${projPath}/fastq/${histName}_R2.fastq.gz
 ```
 
-## 2.2. Quality Control using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) [Optional]
-
-### 2.2.1 Obtain FastQC
-```{r, engine = 'bash', eval = FALSE}
-##== linux command ==##
-mkdir -p $projPath/tools
-wget -P $projPath/tools https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.9.zip
-cd $projPath/tools
-unzip fastqc_v0.11.9.zip
-```
-
-### 2.2.2 Run FastQC for quality check
-```{r, engine = 'bash', eval = FALSE}
-##== linux command ==##
-mkdir -p ${projPath}/fastqFileQC/${histName}
-
-$projPath/tools/FastQC/fastqc -o ${projPath}/fastqFileQC/${histName} -f fastq ${projPath}/fastq/${histName}_R1.fastq.gz
-$projPath/tools/FastQC/fastqc -o ${projPath}/fastqFileQC/${histName} -f fastq ${projPath}/fastq/${histName}_R2.fastq.gz
-```
-
-### 2.2.3 Intepret the quality check results.
-
-Quality check reference: [https://www.bioinformatics.babraham.ac.uk/projects/fastqc/bad_sequence_fastqc.html](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/bad_sequence_fastqc.html)
-
-
-![**Figure 2. Per base sequence content fails the FastQC quality check.**](figures/R1_sequenceContent.png)
-
-**??**
-- Tn5 preference
-
-- The discordant sequence content at the begining of the reads are common phenomenon for CUT&Tag reads. What you might be detecting is the 10-bp periodicity that shows up as a sawtooth pattern in the length distribution. If so, this is normal and will not affect alignment or peak calling. In any case we do not recommend trimming as the bowtie2 parameters that we list will give accurate mapping information without trimming.
 
 # III. Alignment
 
@@ -230,7 +198,7 @@ Bowtie2 alignment results summary is saved at ```${projPath}/alignment/sam/bowti
 
 ### 3.1.1 Sequencing depth
 
-We first check the sequencing depth of the data we have. 
+We first check the sequencing depth of the data we have before alignment. 
 
 ```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8, out.width = "100%"}
 ##=== R command ===## 
@@ -260,9 +228,10 @@ alignResult %>% ggplot(aes(x = Histone, y = seqDepth, fill = Histone)) +
 ```
  
 - Millions of reads are collected for the illustration data. 
-- A reasonable minimum sequencing depth is **??**
 
-### 3.1.2 Alignemnt rate
+- A clean histone modifification antibody will give you robust results (based on FRiP analysis covered in later section) with only 1 million fragments, but a low-affinity antibody to a transcription factor will require 10 times as many fragments to call peaks. In [Protocols.io - Bench Top CUT&Tag V.3](https://www.protocols.io/view/bench-top-cut-amp-tag-bcuhiwt6?step=69) we show an example of tracks from a typical experiment with ~2-3 million fragments.
+
+### 3.1.2 Alignment rate
 
 One aspect to check the quality of the data is to look at the alignment rate.
 ```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
@@ -277,7 +246,7 @@ alignResult %>% ggplot(aes(x = Histone, y = alignRate, fill = Histone)) +
     xlab("")
 ```
 
-- The alignment rates are all above 90% which is pretty high.
+- The alignment rates are all above 80% which is pretty high.
 
 ### 3.1.3 Number of alignable reads
 
@@ -296,7 +265,7 @@ alignResult %>% ggplot(aes(x = Histone, y = alignNum, fill = Histone)) +
 
 - There are still millions of reads that are alignable and pass on to downstream analysis.
 
-## 3.2. Filtering mapped reads by the mapping quality filtering [optinal]
+## 3.2. Filtering mapped reads by the mapping quality filtering [optional]
 
 Some project may require more stringent filtering on the alignment quality score. This [blog](http://biofinysics.blogspot.com/2014/05/how-does-bowtie2-assign-mapq-scores.html) detailedly discussed how does bowtie assign quality score with examples.
 
@@ -366,7 +335,7 @@ dupResult %>% ggplot(aes(x = Histone, y = dupRate * 100, fill = Histone)) +
 
 ```
 
-- If you go back to the sequencing depth figure in section 1.1 and 1.3, you will find the negative correlation between the sequencing depth and the duplication rate. In other words, usually samples that have higher sequencing depth will have low duplication rate.
+- IgG samples in this tutorial have relatively high duplication rate. Therefore, it is recommended to remove the duplicates for IgG samples before downstream anlysis.
 
 
 ### 3.3.2 Unique library size
@@ -402,12 +371,12 @@ samtools view -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam | awk -F'\
 fragLen = c()
 for(hist in histList){
   histInfo = strsplit(hist, "_")[[1]]
-  fragLen = read.table(paste0(projPath, "/alignment/sam/fragmentLen/", hist, "_fragmentLen.txt"), header = FALSE) %>% mutate(fragLen = V1 %>% as.numeric, Weight = as.numeric(V2)/sum(as.numeric(V2)), Histone = histInfo[1], Replicate = histInfo[2], histInfo = hist) %>% rbind(fragLen, .)
+  fragLen = read.table(paste0(projPath, "/alignment/sam/fragmentLen/", hist, "_fragmentLen.txt"), header = FALSE) %>% mutate(fragLen = V1 %>% as.numeric, fragCount = V2 %>% as.numeric, Weight = as.numeric(V2)/sum(as.numeric(V2)), Histone = histInfo[1], Replicate = histInfo[2], histInfo = hist) %>% rbind(fragLen, .)
   
 }
 
 ## Generate the fragment size density plot (violin plot)
-fragLen %>% ggplot(aes(x = histInfo, y = fragLen, weight = Weight, fill = Histone)) +
+fragLen %>% ggplot(aes(x = factor(histInfo, histList), y = fragLen, weight = Weight, fill = Histone)) +
     geom_violin(bw = 5) +
     scale_y_continuous(breaks = seq(0, 800, 50)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
@@ -418,9 +387,27 @@ fragLen %>% ggplot(aes(x = histInfo, y = fragLen, weight = Weight, fill = Histon
     xlab("")
 ```
 
-- There should be periodic peaking pattern of 200bp as a unit.
+- There should be periodic peaking pattern of 200bp as a unit for the histone modification target.
 - These are fragments that are the size of nucleosomes, the expected result of targeting histone.
-- The smaller fragments (50-100 bp) are not bad, they just result from tagmentation within nucleosomes.
+- The smaller fragments (50-100 bp) can be due to that tethered Tn5 can tagment on the surface of a nucleosome as well as in linker regions, so the small fragments might not be background.
+
+Zooming into the single base pair, the fragment counts distribution at each fragment length reveals the 10-bp periodicity, which is a unique feature of tagmentation and can provide as a confirmation that the experiment worked. 
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
+##=== R command ===## 
+
+fragLen %>% ggplot(aes(x = fragLen, y = fragCount, color = Histone, group =interaction(Histone, Replicate), linetype = Replicate)) +
+    ## geom_point(size = 0.8, shape = 19) +
+    geom_line(size = 1) +
+    ## scale_y_continuous(breaks = seq(0, 800, 50)) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma") +
+    theme_bw(base_size = 20) +
+    ## ggpubr::rotate_x_text(angle = 20) +
+    xlab("Fragment Length") +
+    ylab("Count") +
+  coord_cartesian(xlim = c(0, 500))
+```
+
+
 
 # IV. Alignment results filtering and file format conversion
 
@@ -543,7 +530,7 @@ scaleFactor %>% ggplot(aes(x = Histone, y = scaleFactor, fill = Histone)) +
 - The drop of file size should be expected as the input files are the alignment for all the fragments but the output is genome coverage which is like a summary of the fragment alignment results. However, it won't hurt to carefully check the output file.
 
 
-## 5.4 Total number of fragments after normaliztion (seqDepth)
+## 5.4 Total number of fragments after normalization (seqDepth)
 
 ```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
 ##=== R command ===## 
@@ -564,30 +551,6 @@ normDepth %>% ggplot(aes(x = Histone, y = normDepth, fill = Histone)) +
 ## 5.5 ChIPseqSpikeInFree for experiments without spike-ins [Optional]
 
 [ChIPseqSpikeInFree: a ChIP-seq normalization approach to reveal global changes in histone modifications without spike-in](https://academic.oup.com/bioinformatics/article/36/4/1270/5578481) is a novel ChIP-seq normalization method to effectively determine scaling factors for samples across various conditions and treatments, which does not rely on exogenous spike-in chromatin or peak detection to reveal global changes in histone modification occupancy. The installation details can be found on [github](https://github.com/stjude/ChIPseqSpikeInFree).
-
-```{r echo=TRUE, eval = FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
-##=== R command ===## 
-library("ChIPseqSpikeInFree")
-
-bamDir = paste0(projPath, "/alignment/bam")
-metaData = c()
-for(hist in histList){
-  histInfo = strsplit(hist, "_")[[1]] 
-
-  metaData = data.frame(ID = paste0(hist, "_bowtie2.mapped.bam"), ANTIBODY = histInfo[1], GROUP = histInfo[2]) %>% rbind(metaData, .)
-  
-}
-write.table(metaData, file = paste0(projPath, "/alignment/ChIPseqSpikeInFree/metaData.txt"), row.names = FALSE, quote = FALSE, sep = "\t")
-
-metaFile = paste0(projPath, "/alignment/ChIPseqSpikeInFree/metaData.txt")
-bams = paste0(projPath, "/alignment/bam/", metaData$ID)
-ChIPseqSpikeInFree(bamFiles = bams, chromFile = "hg38", metaFile = metaFile, prefix = paste0(projPath, "/alignment/ChIPseqSpikeInFree/SpikeInFree_results"))
-
-```
-
-- [Interpretation of the ChIPseqSpikeInFree output.](https://github.com/stjude/ChIPseqSpikeInFree#interpretation-of-scaling-factor-table)
-
-- [How to use ChIPseqSpikeInFree scaling factor.](https://github.com/stjude/ChIPseqSpikeInFree#how-to-use-chipseqspikein-scaling-factor)
 
 
 # VI. Peak calling
@@ -638,7 +601,7 @@ peakN %>% ggplot(aes(x = Histone, y = peakN, fill = Histone)) +
     xlab("")
 ```
 
-### 6.1.2 Distribution of the peak length
+### 6.1.2 Distribution of the peak width
 
 ```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
 ##=== R command ===## 
@@ -703,7 +666,7 @@ peakReprod %>% ggplot(aes(x = Histone, y = peakReprodRate, fill = Histone, label
     xlab("")
 ```
 
-### 6.1.4 FRagment proportion in Peaks regions (FRiPs).
+### 6.1.4 Fraction of Reads in Peaks regions (FRiPs).
 
 - We utilize the SEACR peaks contrasting with IgG controls for illustration.
 
@@ -725,7 +688,8 @@ for(hist in histL){
   }
 }
 
-frip = left_join(inPeakData, alignResult, by = c("Histone", "Replicate")) %>% mutate(frip = inPeakN/alignNum * 100)
+frip = left_join(inPeakData, alignResult, by = c("Histone", "Replicate")) %>% mutate(frip = inPeakN/alignNum)
+
 
 frip %>% ggplot(aes(x = Histone, y = frip, fill = Histone, label = round(frip, 2))) +
     geom_boxplot() +
@@ -733,7 +697,7 @@ frip %>% ggplot(aes(x = Histone, y = frip, fill = Histone, label = round(frip, 2
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
     theme_bw(base_size = 20) +
-    ylab("% of Fragments in Peaks") +
+    ylab("Fraction of Reads in Peaks") +
     xlab("")
 
 ```
@@ -789,7 +753,7 @@ bamCoverage -b $projPath/alignment/bam/${histName}.sorted.bam -o $projPath/align
 
 ```
 
-### 7.2.1 Heatmap over transcripts
+### 7.2.1 Heatmap over transcription units
 
 
 ```{r, engine = 'bash', eval = FALSE}
@@ -812,15 +776,19 @@ plotHeatmap -m $projPath/data/hg38_gene/matrix_gene.mat.gz -out $projPath/data/h
 ![**Figure 6. Heatmap of histone enrichment around genes**](figures/Histone_gene.png)
 ### 7.2.2. Heatmap on CUT&Tag peaks
 
+We use the center of the max signal region returned from SEACR. In the sixth column of the SEACR output, there is an entry in the form chr:start-end that represents the first and last bases in the region that attain the maximum signal in the region. We first generate a new bed file containing this peak summit information in column 6 and use deeptools for the heatmap visualization.
 
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
-computeMatrix scale-regions -S $projPath/alignment/bigwig/${histName}_raw.bw \
-              -R $projPath/peakCalling/SEACR/${histName}_seacr_control.peaks.stringent.bed \
-              --skipZeros -o $projPath/peakCalling/SEACR/${histName}_SEACR.mat.gz -p $cores
+awk '{split($6, summit, ":"); split(summit[2], region, "-"); print summit[1]"\t"region[1]"\t"region[2]}' $projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.pe\
+aks.stringent.bed >$projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.peaks.summitRegion.bed
+
+computeMatrix reference-point -S $projPath/alignment/bigwig/${histName}_${repName}_raw.bw \
+              -R $projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.peaks.summitRegion.bed \
+              --skipZeros -o $projPath/peakCalling/SEACR/${histName}_${repName}_SEACR.mat.gz -p $cores -a 3000 -b 3000 --referencePoint center
 
 plotHeatmap -m $projPath/peakCalling/SEACR/${histName}_SEACR.mat.gz -out $projPath/peakCalling/SEACR/${histName}_SEACR_heatmap.png --sortUsing sum --startLabel "Peak Start" -\
--endLabel "Peak End" --xAxisLabel "" --regionsLabel "Peaks" --samplesLabel ${histName}
+-endLabel "Peak End" --xAxisLabel "" --regionsLabel "Peaks" --samplesLabel "${histName} ${repName}"
 ```
 
 ![**Figure 7. Heatmap of histone enrichment in peaks**](figures/Histone_peak.png)
