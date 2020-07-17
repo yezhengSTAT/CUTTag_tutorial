@@ -40,7 +40,7 @@ editor_options:
 
 *File creation: March 13, 2020*  
 
-*Final Update: June 1, 2020* 
+*Update: July 15, 2020* 
 
 **Approximate time: 60 - 120 minutes**
 
@@ -48,34 +48,29 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE, dev="CairoPNG", out.width = "100%")#, cache=TRUE)
 ```
 
-```{r echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
-library(dplyr)
-library(stringr)
-library(ggplot2)
-library(viridis)
-library(GenomicRanges)
-library(chromVAR) ## For FRiP analysis and differential analysis
-library(DESeq2) ## For differential analysis section
-```
+
 
 
 # I. Introduction
 
 ## 1.1. Overview of CUT&Tag 
  
-Cleavage Under Targets and Tagmentation (CUT&Tag) is an epigenomic profiling strategy in which antibodies are bound to chromatin proteins in situ in permeabilized nuclei, and then used to tether the cut-and-paste transposase Tn5. Activation of the transposase simultaneously cleaves DNA and adds DNA sequencing adapters (“tagmentation”) for paired-end DNA sequencing. The most recent streamlined CUT&Tag protocol has successfully suppressed exposure artifacts to ensure high-fidelity mapping of the antibody-targeted protein and improved signal-to-noise over current chromatin profiling methods. Streamlined CUT&Tag can be performed in a single PCR tube from cells to amplified libraries, providing low-cost high-resolution genome-wide chromatin maps. By simplifying library preparation, CUT&Tag requires less than a day at the bench from live cells to sequencing-ready barcoded libraries. Because of low background levels, barcoded and pooled CUT&Tag libraries can be sequenced for ~$25 per sample, enabling routine genome-wide profiling of chromatin proteins and modifications that requires no special skills or equipment.
+All dynamic processes that take place on DNA in the eukaryotic nucleus occur in the context of a chromatin landscape that comprises nucleosomes and their modifications, transcription factors, and chromatin-associated complexes. A variety of chromatin features mark sites of activating and silencing transcriptional regulatory elements and chromatin domains that differ between cell types and change during development. 
 
-The mapping of chromatin features genome-wide has traditionally been performed using chromatin immunoprecipitation (ChIP), in which chromatin is cross-linked and solubilized and an antibody to a protein or modification of interest is used to immunoprecipitate the bound DNA. Very little has changed in the way ChIP is most generally performed since it was first described 35 years ago, and remains fraught with signal-to-noise issues and artifacts. An alternative chromatin profiling strategy is enzyme tethering in situ whereby the chromatin protein or modification of interest is targeted by an antibody or fusion protein, and the underlying DNA is marked or released. A succession of enzyme-tethering methods have been introduced over the past two decades. Cleavage Under Targets & Tagmentation (CUT&Tag) is a tethering method that uses a protein-A-Tn5 (pA-Tn5) transposome fusion protein. Permeabilized cells or nuclei are incubated with antibody to a specified chromatin protein, and then pA-Tn5 loaded with mosaic end adaptors is successively tethered to antibody-bound sites. Activation of the transposome by adding magnesium ions results in the integration of the adaptors into nearby DNA. These are then amplified to generate sequencing libraries. Antibody-tethered Tn5-based methods achieve high sensitivity owing to stringent washing of samples after pA-Tn5 tethering and the high efficiency of adaptor integration. The improved signal-to-noise relative to ChIP-seq translates to an order-of-magnitude reduction in the amount of sequencing required to map chromatin features. Therefore, we use barcoded PCR primers to enable sample-pooling (typically up to 90 samples) for paired-end sequencing on Illumina NGS sequencers.
+The mapping of chromatin features genome-wide has traditionally been performed using chromatin immunoprecipitation (ChIP), in which chromatin is cross-linked and solubilized, and an antibody to a protein or modification of interest is used to immunoprecipitate the bound DNA (Fig. 1a). Very little has changed in the way ChIP is most generally performed since it was first described 35 years ago, and remains fraught with signal-to-noise issues and artifacts. An alternative chromatin profiling strategy is enzyme tethering in situ whereby the chromatin protein or modification of interest is targeted by an antibody or fusion protein. Then, the underlying DNA is marked or cleaved, and a succession of enzyme-tethering methods have been introduced over the past two decades. Cleavage Under Targets & Tagmentation (CUT&Tag) is a tethering method that uses a protein-A-Tn5 (pA-Tn5) transposome fusion protein (Fig. 1b). In CUT&Tag, permeabilized cells or nuclei are incubated with antibody to a specified chromatin protein, and then pA-Tn5 loaded with mosaic end adaptors is successively tethered to antibody-bound sites. Activation of the transposome by adding magnesium ions results in the integration of the adaptors into nearby DNA. These are then amplified to generate sequencing libraries. Antibody-tethered Tn5-based methods achieve high sensitivity owing to stringent washing of samples after pA-Tn5 tethering and the high efficiency of adaptor integration. The improved signal-to-noise relative to ChIP-seq translates to an order-of-magnitude reduction in the amount of sequencing required to map chromatin features, allowing sample pooling (typically up to 90 samples) for paired-end sequencing on Illumina NGS sequencers by barcoded PCR of libraries.
  
-With all the differences between ChIP-seq and CUT&Tag data, we launched this tutorial tailored for processing and analyzing CUT&Tag data.
 
-![**Figure 1. Differences between immunoprecipitation and in antibody-targeted chromatin profiling strategies.**](figures/ChIPseqCUTTag.png)
+![**Figure 1. Differences between immunoprecipitation and in antibody-targeted chromatin profiling strategies.**  **A.** ChIP-seq experimental procedure. **B.** CUT&Tag experimental procedure. Cells and nuclei are indicated in grey, chromatin as red nucleosomes, and a specific chromatin protein in green.](figures/ChIPseqCUTTag.png)
 
 ## 1.2. Objectives
 
-This tutorial is designed for processing and analyzing CUT&Tag data following the [Bench top CUT&Tag V.3 protocol](https://www.protocols.io/view/bench-top-cut-amp-tag-bcuhiwt6/abstract), an enzyme-tethering strategy that provides efficient high-resolution sequencing libraries for profiling diverse chromatin components. 
- 
-## 1.3. Requirements
+This tutorial is designed for processing and analyzing CUT&Tag data following the [Bench top CUT&Tag V.3 protocol](https://www.protocols.io/view/bench-top-cut-amp-tag-bcuhiwt6/abstract).  The illustration data used in this tutorial is the profiling of histone modifications in the human lymphoma K562 cell line, but the tutorial is generally applicable to any chromatin protein, including transcription factors, RNA polymerase II, and epitope-tagged proteins.
+
+## 1.3 CUT&Tag data processing and analysis outline.
+
+![**Figure 2. CUT&Tag data processing and analysis.**](figures/CUTTag_Diagram.png)
+
+## 1.4. Requirements
 
 - Linux system
 
@@ -87,7 +82,19 @@ This tutorial is designed for processing and analyzing CUT&Tag data following th
   - GenomicRanges
   - chromVAR
   - DESeq2
-  - ChIPseqSpikeInFree
+  - ggpubr
+  - ChIPseqSpikeInFree [Optional]
+  
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(viridis)
+library(GenomicRanges)
+library(chromVAR) ## For FRiP analysis and differential analysis
+library(DESeq2) ## For differential analysis section
+library(ggpubr) ## For customizing figures
+```
 
 - FastQC(version >= 0.11.9)
 
@@ -103,57 +110,57 @@ This tutorial is designed for processing and analyzing CUT&Tag data following th
 
 - deepTools (version >= 2.0)
  
-## 1.4. Data
+## 1.5. Data Downloading
 
-In this tutorial, we use data from Kaya-Okur et al. (2020).
+In this tutorial, we use data from Kaya-Okur et al. (2020), and available for downloading from [GEO](https://www.ncbi.nlm.nih.gov/geo/). The corresponding SRA entries are provided below.
 
-- H3K27me3: 
-  - SH_Hs_K27m3_NX_0918 as replicate 1
-  - SH_Hs_K27m3_Xpc_0107 as replicate 2
+Options to download SRA sequences from GEO: 
 
-- H3K4me3:
-  - SH_Hs_K4m3_NX_0918 as replicate 1
-  - SH_Hs_K4m3_Xpc_0107 as replicate 2
+- a. Using [SRA Toolkit](https://www.ncbi.nlm.nih.gov/sra/docs/sradownload/)
 
-- IgG:
-  - SH_Hs_IgG_o_2kA_0919 as replicate 1
-  - SH_Hs_IgG_n_6kA_0918 as replicate 2
+- b. Download through [European Nucleotide Archive](file:///Users/yezheng/Downloads/downloading_fastq_GEO.pdf). New ENA Browser: https://www.ebi.ac.uk/ena/browser/view. We are using this option as illustration.
 
-
-
-## 1.5. Download the data
-
-We will do the data downloading, pre-processing and processing on each histone sample respectively. In this tutorial, we will use H3K27me3 replicate 1 as the illustration.
-
-First, we need to denote the histone name and project path.
+First, we need to specify the project path.
 
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
-histName="K27me3_rep1"
 projPath="/path/to/project/where/data/and/results/are/saved"
 ```
 
 
-Data were downloaded from ```http://heniweb.fhcrc.org/data/hs20190927_SH.html```.
+- H3K27me3: 
+  - SH_Hs_K27m3_NX_0918 as replicate 1: GEO accession: GSE145187
+  - SH_Hs_K27m3_Xpc_0107 as replicate 2: GEO accession: GSE145187, SRA entry: SRX7713678
 
+- H3K4me3:
+  - SH_Hs_K4m3_NX_0918 as replicate 1: GEO accession: GSE145187, SRA entry: SRX7713692
+  - SH_Hs_K4m3_Xpc_0107 as replicate 2: GEO accession: GSE145187, SRA entry: SRX7713696
+
+
+
+- IgG:
+  - SH_Hs_IgG_1x_0924 as replicate 1:GEO accession: GSE145187, SRA entry: SRX8468909
+  - SH_Hs_IgG_20181224 as replicate 2: GEO accession: GSM3680227, SRA entry: SRX5545346
+
+Taking SH_Hs_IgG_20181224 as an example.
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
-mkdir -p $projPath/data
-wget -P $projPath/data path/to/open/source/data
+wget -O $projPath/data/IgG_rep2/IgG_rep2_R1_001.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR875/001/SRR8754611/SRR8754611_1.fastq.gz
+
+wget -O $projPath/data/IgG_rep2/IgG_rep2_R2_001.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR875/001/SRR8754611/SRR8754611_2.fastq.gz
+
+wget -O $projPath/data/IgG_rep2/IgG_rep2_R1_002.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR875/002/SRR8754612/SRR8754612_1.fastq.gz
+
+wget -O $projPath/data/IgG_rep2/IgG_rep2_R2_002.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR875/002/SRR8754612/SRR8754612_2.fastq.gz
 ```
+
+
 
 # II. Data Pre-processing
 
-## 2.1. Merge technical replicate if needed [Optional]
+## 2.1. Quality Control using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) [Optional]
 
-```{r, engine = 'bash', eval = FALSE}
-##== linux command ==##
-mkdir -p ${projPath}/fastq
-cat ${projPath}/data/${histName}/*_R1_*.fastq.gz >${projPath}/fastq/${histName}_R1.fastq.gz
-cat ${projPath}/data/${histName}/*_R2_*.fastq.gz >${projPath}/fastq/${histName}_R2.fastq.gz
-```
-
-## 2.2. Quality Control using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) [Optional]
+This step is not required. In case that users are generating their own data and FastQC is one of the routine checking procedures in users' group, we provide this step as troubleshoting explanation.
 
 ### 2.2.1 Obtain FastQC
 ```{r, engine = 'bash', eval = FALSE}
@@ -180,16 +187,43 @@ Quality check reference: [https://www.bioinformatics.babraham.ac.uk/projects/fas
 
 ![**Figure 2. Per base sequence content fails the FastQC quality check.**](figures/R1_sequenceContent.png)
 
-**??**
-- Tn5 preference
+** The discordant sequence content at the begining of the reads are common phenomenon for CUT&Tag reads. Failing to pass the Per base seuqnence content does not mean your data failed.**
 
-- The discordant sequence content at the begining of the reads are common phenomenon for CUT&Tag reads. What you might be detecting is the 10-bp periodicity that shows up as a sawtooth pattern in the length distribution. If so, this is normal and will not affect alignment or peak calling. In any case we do not recommend trimming as the bowtie2 parameters that we list will give accurate mapping information without trimming.
+- It can be due to the Tn5 preference.
+
+- What you might be detecting is the 10-bp periodicity that shows up as a sawtooth pattern in the length distribution. If so, this is normal and will not affect alignment or peak calling. In any case we do not recommend trimming as the bowtie2 parameters that we list will give accurate mapping information without trimming.
+
+## 2.2. Merge technical replicates/lanes if needed [Optional]
+
+Sometimes, samples are often sequenced across multiple lanes for efficiency and can be pooled before alignment. If you want to check the reproducibility between sequences of different lanes of the same sample, you can skip this step and align each sequencing file (fastq file) respectively.
+
+```{r, engine = 'bash', eval = FALSE}
+##== linux command ==##
+histName="K27me3_rep1"
+
+mkdir -p ${projPath}/fastq
+cat ${projPath}/data/${histName}/*_R1_*.fastq.gz >${projPath}/fastq/${histName}_R1.fastq.gz
+cat ${projPath}/data/${histName}/*_R2_*.fastq.gz >${projPath}/fastq/${histName}_R2.fastq.gz
+```
+
 
 # III. Alignment
 
  
 ## 3.1. Bowtie2 alignment [required]
- 
+
+
+The structure of CUT&Tag tagmented libraries is shown below.
+```
+TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG-insert-CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
+AGCAGCCGTCGCAGTCTACACATATTCTCTGTC-insert-GACAGAGAATATGTGTAGAGGCTCGGGTGCTCTG
+```
+Figure 2: CUT&Tag insert libraries with the sequence of adapters.
+
+Our standard pipeline is to perform single-index 25x25 PE Illumina sequencing on up to 90 pooled samples on a single HiSeq 2500 flowcell, where each sample has a unique PCR primer barcode. Amounts for each library are adjusted to provide ~5 million paired-end reads, which provides high-quality profiling for abundant chromatin features with a specific and high-yield antibody. Less abundant features typically require fewer reads, while lower-quality antibodies may increase the number of reads needed for generating robust chromatin profiles. A thorough discussion of feature recall and sequencing depths for CUT&Tag has been published (Kaya-Okur et al 2020).
+
+### 3.1.1 Alignment to HG38. 
+
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
 cores=8
@@ -206,13 +240,37 @@ mkdir -p ${projPath}/alignment/bedgraph
 bowtie2 --end-to-end --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700 -p ${cores} -x ${ref} -1 ${projPath}/fastq/${histName}_R1.fastq.gz -2 ${projPath}/fastq/${histName}_R2.fastq.gz -S ${projPath}/alignment/sam/${histName}_bowtie2.sam &> ${projPath}/alignment/sam/bowtie2_summary/${histName}_bowtie2.txt
 ```
 
-The paired-end reads are aligned by Bowtie2 using parameters: ```--end-to-end --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700```
+The paired-end reads are aligned by Bowtie2 using parameters ```--end-to-end --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700``` for mapping of inserts 10-700 bp in length. 
 
-Parameters explanation:
+**Critical step**: There is no need to trim reads from out standard 25x25 PE sequencing, as adapter sequences will not be included in reads of inserts >25 bp. However, for users performing longer sequencing, reads will need to be trimmed by Cutadapt and mapped by ```--local --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700``` to ignore any remaining adapter sequence at the 3' ends of reads during mapping.
+ 
 
-http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+### 3.1.2 Alignment to spike-in genome for spike-in calibration [optional/recommended]
 
-Bowtie2 alignment results summary is saved at ```${projPath}/alignment/sam/bowtie2)summary/${histName}_bowtie2.txt```:
+This section is **optional** but **recommended** depending on your experimental protocol.
+
+E. coli DNA is carried along with bacterially-produced pA-Tn5 protein and gets tagmented non-specifically during the reaction. The fraction of total reads that map to the E.coli genome depends on the yield of epitope-targeted CUT&Tag, and so depends on the number of cells used and the abundance of that epitope in chromatin. Since a constant amount of pATn5 is added to CUT&Tag reactions and brings along a fixed amount of E. coli DNA, E. coli reads can be used to normalize epitope abundance in a set of experiments. More discussion, please see Section V.
+
+```{r, engine = 'bash', eval = FALSE}
+##== linux command ==##
+spikeInRef="/shared/ngs/illumina/henikoff/Bowtie2/Ecoli"
+chromSize="/fh/fast/gottardo_r/yezheng_working/SupplementaryData/hg38/chromSize/hg38.chrom.size"
+
+## bowtie2-build path/to/Ecoli/fasta/Ecoli.fa /path/to/bowtie2Index/Ecoli
+bowtie2 --end-to-end --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700 -p ${cores} -x ${spikeInRef} -1 ${projPath}/fastq/${histName}_R1.fastq.gz -2 ${projPath}/fastq/${histName}_R2.fastq.gz -S $projPath/alignment/sam/${histName}_bowtie2_spikeIn.sam &> $projPath/alignment/sam/bowtie2_summary/${histName}_bowtie2_spikeIn.txt
+
+seqDepthDouble=`samtools view -F 0x04 seqDepth=$((seqDepthDouble/2))
+echo $seqDepth >$projPath/alignment/sam/bowtie2_summary/${histName}_bowtie2_spikeIn.seqDepth
+
+```
+
+- For spike-in normalization, reads are aligned to the E. coli genome U00096.3 with two more parameters ```--no-overlap``` and ```--no-dovetail``` (```--end-to-end --very-sensitive --no-overlap --no-dovetail --no-mixed --no-discordant --phred33 -I 10 -X 700```) to avoid possible cross-mapping of the experimental genome to that of the carry-over E. coli DNA that is used for calibration.
+
+### 3.1.3 Alignment summary
+
+For more detailed parameters explanation, users can refer to the [bowite2 manual](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml).
+
+Bowtie2 alignment results summary is saved at ```${projPath}/alignment/sam/bowtie2)summary/${histName}_bowtie2.txt``` and you should expect the results look similar.
 
 ```
 2984630 reads; of these:
@@ -228,100 +286,123 @@ Bowtie2 alignment results summary is saved at ```${projPath}/alignment/sam/bowti
 - 2360430 + 499090 is the number of read paris that are successfully mapped.
 - 95.81% is the overall alignment rate
 
-### 3.1.1 Sequencing depth
+## 3.2 Report sequencing mapping summary [required]
 
-We first check the sequencing depth of the data we have. 
+Summarize the raw reads and uniquely mapping reads to report the efficiency of alignment. Alignment frequencies are expected to be >80% for high-quality data. CUT&Tag data typically has very low backgrounds, so as few as 1 million mapped fragments can give robust profiles for a histone modification in the human genome. Profiling of less-abundant transcription factors and chromatin proteins may require 10 times as many mapped fragments for downstream analysis.
+
+We can evaluate the following metrics:
+
+ - Sequencing depth
+ - Alignment rate
+ - Number of mappable fragments
+ - Duplication rate
+ - Unique library size
+ - Fragment size distribution
+
+### 3.2.1 Sequencing depth
 
 ```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8, out.width = "100%"}
 ##=== R command ===## 
 ## Path to the project and histone list
 projPath = "/fh/fast/gottardo_r/yezheng_working/cuttag/CUTTag_tutorial"
-histList = c("K27me3_rep1", "K27me3_rep2", "K4me3_rep1", "K4me3_rep2", "IgG_rep1", "IgG_rep2")
+sampleList = c("K27me3_rep1", "K27me3_rep2", "K4me3_rep1", "K4me3_rep2", "IgG_rep1", "IgG_rep2")
+histList = c("K27me3", "K4me3", "IgG")
 
 ## Collect the alignment results from the bowtie2 alignment summary files
 alignResult = c()
-for(hist in histList){
+for(hist in sampleList){
   alignRes = read.table(paste0(projPath, "/alignment/sam/bowtie2_summary/", hist, "_bowtie2.txt"), header = FALSE, fill = TRUE)
   alignRate = substr(alignRes$V1[6], 1, nchar(as.character(alignRes$V1[6]))-1)
   histInfo = strsplit(hist, "_")[[1]]
-  alignResult = data.frame(seqDepth = alignRes$V1[1] %>% as.character %>% as.numeric, alignNum = alignRes$V1[4] %>% as.character %>% as.numeric + alignRes$V1[5] %>% as.character %>% as.numeric, alignRate = alignRate %>% as.numeric, Histone = histInfo[1], Replicate = histInfo[2])  %>% rbind(alignResult, .)
+  alignResult = data.frame(Histone = histInfo[1], Replicate = histInfo[2], 
+                           SequencingDepth = alignRes$V1[1] %>% as.character %>% as.numeric, 
+                           MappedFragNum_hg38 = alignRes$V1[4] %>% as.character %>% as.numeric + alignRes$V1[5] %>% as.character %>% as.numeric, 
+                           AlignmentRate_hg38 = alignRate %>% as.numeric)  %>% rbind(alignResult, .)
 }
+alignResult$Histone = factor(alignResult$Histone, levels = histList)
+alignResult %>% mutate(AlignmentRate_hg38 = paste0(AlignmentRate_hg38, "%"))
+```
 
+
+### 3.2.2 Spike-in alignment 
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
+##=== R command ===## 
+spikeAlign = c()
+for(hist in sampleList){
+  spikeRes = read.table(paste0(projPath, "/alignment/sam/bowtie2_summary/", hist, "_bowtie2_spikeIn.txt"), header = FALSE, fill = TRUE)
+  alignRate = substr(spikeRes$V1[6], 1, nchar(as.character(spikeRes$V1[6]))-1)
+  histInfo = strsplit(hist, "_")[[1]]
+  spikeAlign = data.frame(Histone = histInfo[1], Replicate = histInfo[2], 
+                          SequencingDepth = spikeRes$V1[1] %>% as.character %>% as.numeric, 
+                          MappedFragNum_spikeIn = spikeRes$V1[4] %>% as.character %>% as.numeric + spikeRes$V1[5] %>% as.character %>% as.numeric, 
+                          AlignmentRate_spikeIn = alignRate %>% as.numeric)  %>% rbind(spikeAlign, .)
+}
+spikeAlign$Histone = factor(spikeAlign$Histone, levels = histList)
+spikeAlign %>% mutate(AlignmentRate_spikeIn = paste0(AlignmentRate_spikeIn, "%"))
+```
+
+### 3.2.3 Summarize the alignment to hg38 and E.coli
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE}
+##=== R command ===## 
+alignSummary = left_join(alignResult, spikeAlign, by = c("Histone", "Replicate", "SequencingDepth")) %>%
+  mutate(AlignmentRate_hg38 = paste0(AlignmentRate_hg38, "%"), 
+         AlignmentRate_spikeIn = paste0(AlignmentRate_spikeIn, "%"))
+alignSummary
+```
+
+### 3.2.4 Visualizing the sequencing depth and alignment results.
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=11, fig.height=8}
+##=== R command ===## 
 ## Generate sequencing depth boxplot
-alignResult %>% ggplot(aes(x = Histone, y = seqDepth, fill = Histone)) +
+fig3A = alignResult %>% ggplot(aes(x = Histone, y = SequencingDepth, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
     theme_bw(base_size = 20) +
     ylab("Sequencing Depth") +
-    xlab("")
+    xlab("") + 
+    ggtitle("A. Sequencing Depth of Samples in Study")
 
-```
- 
-- Millions of reads are collected for the illustration data. 
-- A reasonable minimum sequencing depth is **??**
-
-### 3.1.2 Alignemnt rate
-
-One aspect to check the quality of the data is to look at the alignment rate.
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
-##=== R command ===## 
-alignResult %>% ggplot(aes(x = Histone, y = alignRate, fill = Histone)) +
-    geom_boxplot() +
-    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
-    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
-    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
-    ylab("% of Mapped Fragments") +
-    xlab("")
-```
-
-- The alignment rates are all above 90% which is pretty high.
-
-### 3.1.3 Number of alignable reads
-
-After alignment, we can check the number of mapped reads, i.e., valid sequencing depth for downstream analysis.
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
-##=== R command ===## 
-alignResult %>% ggplot(aes(x = Histone, y = alignNum, fill = Histone)) +
+fig3B = alignResult %>% ggplot(aes(x = Histone, y = MappedFragNum_hg38, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
     theme_bw(base_size = 20) +
     ylab("# of Mapped Fragments") +
-    xlab("")
+    xlab("") +
+    ggtitle("B. Alignable Fragment (hg38)")
+
+fig3C = alignResult %>% ggplot(aes(x = Histone, y = AlignmentRate_hg38, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab("% of Mapped Fragments") +
+    xlab("") +
+    ggtitle("C. Alignment Rate (hg38)")
+
+fig3D = spikeAlign %>% ggplot(aes(x = Histone, y = AlignmentRate_spikeIn, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab("Spike-in Alignment Rate") +
+    xlab("") +
+    ggtitle("D. Alignment Rate (E.coli)")
+
+ggarrange(fig3A, fig3B, fig3C, fig3D, ncol = 2, nrow=2, common.legend = TRUE, legend="bottom")
 ```
 
-- There are still millions of reads that are alignable and pass on to downstream analysis.
+In a typical CUT&Tag experiment targeting the abundant H3K27me3 histone modification in 65,000 K562 cells, the percentage of E. coli reads range from ~0.01% to 10%. With fewer cells or less abundant epitopes, E. coli reads can comprise as much as 70% or the total mapped reads. For IgG controls, the percentage of E. coli reads is typically much higher than that for an abundant histone modification.
 
-## 3.2. Filtering mapped reads by the mapping quality filtering [optinal]
-
-Some project may require more stringent filtering on the alignment quality score. This [blog](http://biofinysics.blogspot.com/2014/05/how-does-bowtie2-assign-mapq-scores.html) detailedly discussed how does bowtie assign quality score with examples.
-
-MAPQ(x) = -10 * $log_{10}$(P(x is mapped wrongly)) = -10 * $log_{10}(p)$
-
-which ranges from 0 to 37, 40 or 42.
-
-```samtools view -q minQualityScore``` will eliminate all the alignment results that are below the minQualityScore defined by user.
-```{r, engine = 'bash', eval = FALSE}
-##== linux command ==##
-minQualityScore=2
-samtools view -q $minQualityScore ${projPath}/alignment/sam/${histName}_bowtie2.sam >${projPath}/alignment/sam/${histName}_bowtie2.qualityScore$minQualityScore.sam
-```
-
-- If you do implement this filtering, please replace the following input sam file into this filtered sam file.
 
 ## 3.3. Remove duplicates [optional/required] 
 
-- CUT&Tag uses the antibody-tethered Tn5-based methods that can achieve high sensitivity, hence the resulting background noise is low and signal regions are enriched and narrow. Therefore, theoretically we may collect fragments that share exactly the same starting and ending sequences which are not because of the PCR duplication.
-
-- Practically, we found for high quality and high sequencing depth samples, the duplication rate is pretty low and the rest duplicated fragments are highly likely to be the true enrichment signals. Thus, for these sample, we do not recommend removing the duplicates. 
-
-- However, for samples that are of low quality and have too few sequencing depth, their duplication rate can be super high. We recommend removing the duplicates for these samples.
-
-- The following commands show how to check the duplication rate using ```Picard```.
+CUT&Tag integrates adapters into DNA in the vicinity of the antibody-tethered pA-Tn5, and the exact sites of integration are affected by the accessibility of surrounding DNA. For this reason fragments that share exact starting and ending positions are expected to be common, and such ‘duplicates’ may not be due to duplication during PCR. In practice, we have found that the apparent duplication rate is low for high quality CUT&Tag datasets, and even the apparent ‘duplicate’ fragments are likely to be true fragments. Thus, we do not recommend removing the duplicates. In experiments with very small amounts of material or where PCR duplication is suspected, duplicates can be removed. The following commands show how to check the duplication rate using [Picard](https://broadinstitute.github.io/picard/).
 
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
@@ -339,55 +420,74 @@ $picardCMD MarkDuplicates I=$projPath/alignment/sam/${histName}_bowtie2.sorted.s
 picardCMD MarkDuplicates I=$projPath/alignment/sam/${histName}_bowtie2.sorted.sam O=$projPath/alignment/removeDuplicate/${histName}_bowtie2.sorted.rmDup.sam REMOVE_DUPLICATES=true METRICS_FILE=$projPath/alignment/removeDuplicate/picard_summary/${histName}_picard.rmDup.txt
 ```
 
-### 3.3.1 Duplication rate
 
-First, we summarize the duplication rate. 
+We summarize the apparent duplication rate and calculate the unique library size without duplicates. 
 
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE}
 ##=== R command ===## 
 ## Summarize the duplication information from the picard summary outputs.
 dupResult = c()
-for(hist in histList){
+for(hist in sampleList){
   dupRes = read.table(paste0(projPath, "/alignment/rmDuplicate/picard_summary/", hist, "_picard.rmDup.txt"), header = TRUE, fill = TRUE)
   
   histInfo = strsplit(hist, "_")[[1]]
-  dupResult = data.frame(mappedN = dupRes$READ_PAIRS_EXAMINED[1] %>% as.character %>% as.numeric, dupRate = dupRes$PERCENT_DUPLICATION[1] %>% as.character %>% as.numeric, Histone = histInfo[1], Replicate = histInfo[2]) %>% mutate(uniqN = mappedN * (1-dupRate))  %>% rbind(dupResult, .)
+  dupResult = data.frame(Histone = histInfo[1], Replicate = histInfo[2], MappedFragNum_hg38 = dupRes$READ_PAIRS_EXAMINED[1] %>% as.character %>% as.numeric, DuplicationRate = dupRes$PERCENT_DUPLICATION[1] %>% as.character %>% as.numeric * 100, EstimatedLibrarySize = dupRes$ESTIMATED_LIBRARY_SIZE[1] %>% as.character %>% as.numeric) %>% mutate(UniqueFragNum = MappedFragNum_hg38 * (1-DuplicationRate/100))  %>% rbind(dupResult, .)
 }
+dupResult$Histone = factor(dupResult$Histone, levels = histList)
+alignDupSummary = left_join(alignSummary, dupResult, by = c("Histone", "Replicate", "MappedFragNum_hg38")) %>% mutate(DuplicationRate = paste0(DuplicationRate, "%"))
+alignDupSummary
+```
 
+
+- In these example datasets, the IgG control samples have relatively high duplication rates, since reads in this sample derive from non-specific tagmentation in the CUT&Tag reactions. Therefore, it is appropriate to remove the duplicates from the IgG datasets before downstream analysis. 
+
+- The estimated library size is the estimated number of unique molecules in the library based on PE duplication calculated by Picard.
+
+- The estimated library sizes is proportional to the abundance of the targeted epitope and to the quality of the antibody used, while the estimated library sizes of IgG samples are expected to be very low.
+
+- Unique fragment number is calculated by the MappedFragNum_hg38 * (1-DuplicationRate/100).
+
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=11, fig.height=8}
+##=== R command ===## 
 ## generate boxplot figure for the  duplication rate
-dupResult %>% ggplot(aes(x = Histone, y = dupRate * 100, fill = Histone)) +
+fig4A = dupResult %>% ggplot(aes(x = Histone, y = DuplicationRate, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
     theme_bw(base_size = 20) +
     ylab("Duplication Rate (*100%)") +
-    xlab("")
+    xlab("") +
+    ggtitle("A. Duplication Rate")
 
-```
+fig4B = dupResult %>% ggplot(aes(x = Histone, y = EstimatedLibrarySize, fill = Histone)) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab("Estimated Library Size") +
+    xlab("") +
+    ggtitle("B. Estimated Library Size")
 
-- If you go back to the sequencing depth figure in section 1.1 and 1.3, you will find the negative correlation between the sequencing depth and the duplication rate. In other words, usually samples that have higher sequencing depth will have low duplication rate.
-
-
-### 3.3.2 Unique library size
-
-Next, we check the unique library size without duplications.
-
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
-##=== R command ===## 
-dupResult %>% ggplot(aes(x = Histone, y = uniqN, fill = Histone)) +
+fig4C = dupResult %>% ggplot(aes(x = Histone, y = UniqueFragNum, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
     theme_bw(base_size = 20) +
     ylab("# of Unique Fragments") +
-    xlab("")
+    xlab("") +
+    ggtitle("C. Number of Unique Fragments")
+ggarrange(fig4A, fig4B, fig4C, ncol = 3, common.legend = TRUE, legend="bottom")
 ```
 
-- We still have millions of unique fragments left.
+
 
 ## 3.4. Assess mapped fragment size distribution [Required]
+
+CUT&Tag inserts adapters on either side of chromatin particles in the vicinity of the tethered enzyme, although tagmentation within chromatin particles can also occur. So, CUT&Tag reactions targeting a histone modification predominantly results in fragments that are nucleosomal lengths (~180 bp), or multiples of that length. CUT&Tag targeting transcription factors predominantly produce nucleosome-sized fragments and variable amounts of shorter fragments, from neighboring nucleosomes and the factor-bound site, respectively. Tagmentation  of DNA on the surface of nucleosomes also occurs, and plotting fragment lengths with single-basepair resolution reveal a 10-bp sawtooth periodicity, which is typical of successful CUT&Tag experiments.
+
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
 mkdir -p $projPath/alignment/sam/fragmentLen
@@ -396,18 +496,19 @@ mkdir -p $projPath/alignment/sam/fragmentLen
 samtools view -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam | awk -F'\t' 'function abs(x){return ((x < 0.0) ? -x : x)} {print abs($9)}' | sort | uniq -c | awk -v OFS="\t" '{print $2, $1/2}' >$projPath/alignment/sam/fragmentLen/${histName}_fragmentLen.txt
 ```
 
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=11, fig.height=8}
 ##=== R command ===## 
 ## Collect the fragment size information
 fragLen = c()
-for(hist in histList){
+for(hist in sampleList){
   histInfo = strsplit(hist, "_")[[1]]
-  fragLen = read.table(paste0(projPath, "/alignment/sam/fragmentLen/", hist, "_fragmentLen.txt"), header = FALSE) %>% mutate(fragLen = V1 %>% as.numeric, Weight = as.numeric(V2)/sum(as.numeric(V2)), Histone = histInfo[1], Replicate = histInfo[2], histInfo = hist) %>% rbind(fragLen, .)
-  
+  histInfo = strsplit(hist, "_")[[1]]
+  fragLen = read.table(paste0(projPath, "/alignment/sam/fragmentLen/", hist, "_fragmentLen.txt"), header = FALSE) %>% mutate(fragLen = V1 %>% as.numeric, fragCount = V2 %>% as.numeric, Weight = as.numeric(V2)/sum(as.numeric(V2)), Histone = histInfo[1], Replicate = histInfo[2], sampleInfo = hist) %>% rbind(fragLen, .) 
 }
-
+fragLen$sampleInfo = factor(fragLen$sampleInfo, levels = sampleList)
+fragLen$Histone = factor(fragLen$Histone, levels = histList)
 ## Generate the fragment size density plot (violin plot)
-fragLen %>% ggplot(aes(x = histInfo, y = fragLen, weight = Weight, fill = Histone)) +
+fig5A = fragLen %>% ggplot(aes(x = sampleInfo, y = fragLen, weight = Weight, fill = Histone)) +
     geom_violin(bw = 5) +
     scale_y_continuous(breaks = seq(0, 800, 50)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
@@ -416,13 +517,50 @@ fragLen %>% ggplot(aes(x = histInfo, y = fragLen, weight = Weight, fill = Histon
     ggpubr::rotate_x_text(angle = 20) +
     ylab("Fragment Length") +
     xlab("")
+
+fig5B = fragLen %>% ggplot(aes(x = fragLen, y = fragCount, color = Histone, group = sampleInfo, linetype = Replicate)) +
+  geom_line(size = 1) +
+  scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma") +
+  theme_bw(base_size = 20) +
+  xlab("Fragment Length") +
+  ylab("Count") +
+  coord_cartesian(xlim = c(0, 500))
+
+ggarrange(fig5A, fig5B, ncol = 2)
+
 ```
 
-- There should be periodic peaking pattern of 200bp as a unit.
-- These are fragments that are the size of nucleosomes, the expected result of targeting histone.
-- The smaller fragments (50-100 bp) are not bad, they just result from tagmentation within nucleosomes.
+- The smaller fragments (50-100 bp) can be due to that tethered Tn5 can tagment on the surface of a nucleosome as well as in linker regions, so the small fragments might not be background.
+
+## 3.5 Assess replicate reproducibility
+
+Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. The genome is split into 500 bp bins, and a Pearson correlation of the log2-transformed values of read counts in each bin is calculated between replicate datasets. Multiple replicates and IgG control datasets are displayed in a hierarchically clustered correlation matrix. 
+
+```{r}
+## Figure is pending...
+```
+
 
 # IV. Alignment results filtering and file format conversion
+
+## 4.1 Filtering mapped reads by the mapping quality filtering [optinal]
+
+Some project may require more stringent filtering on the alignment quality score. This [blog](http://biofinysics.blogspot.com/2014/05/how-does-bowtie2-assign-mapq-scores.html) detailedly discussed how does bowtie assign quality score with examples.
+
+MAPQ(x) = -10 * $log_{10}$(P(x is mapped wrongly)) = -10 * $log_{10}(p)$
+
+which ranges from 0 to 37, 40 or 42.
+
+```samtools view -q minQualityScore``` will eliminate all the alignment results that are below the minQualityScore defined by user.
+```{r, engine = 'bash', eval = FALSE}
+##== linux command ==##
+minQualityScore=2
+samtools view -q $minQualityScore ${projPath}/alignment/sam/${histName}_bowtie2.sam >${projPath}/alignment/sam/${histName}_bowtie2.qualityScore$minQualityScore.sam
+```
+
+- If you do implement this filtering, please replace the ```${histName}_bowtie2.sam``` in the following steps by this filtered sam file ```${histName}_bowtie2.qualityScore$minQualityScore.sam```.
+
+## 4.2 File format conversion [required]
 
 This section is **required** in preparation for the peak calling and visualization where there are a few filtering and file format conversion that need to be done.
 
@@ -443,26 +581,22 @@ cut -f 1,2,6 $projPath/alignment/bed/${histName}_bowtie2.clean.bed | sort -k1,1 
 
 # V. Spike-in calibration 
 
-This section is **optional** but **recommended** depending on your experimental protocol.
+This section is **optional** but **recommended** depending on your experimental protocol. We have shown the alingment to the spike-in genome in Section 3.1.2 and the spike-in alignment summary in Section 3.2.2.
 
-## 5.1 Alignment to the spike-in genome [optional/recommended]
 
-- To calibrate samples in a series for samples done in parallel using the same antibody we use counts of E. coli fragments carried over with the pA-Tn5 the same as one would for an ordinary spike-in. 
+The underlying assumption is that the ratio of fragments mapped to the primary genome to the E. coli genome is the same for a series of samples, each using the same number of cells. Because of this assumption, we do not normalize between experiments or between batches of purified pATn5, which can have very different amounts of carry-over E. coli DNA. Using a constant C to avoid small fractions in normalized data, we define a scaling factor S as 
 
-- We align E. coli carry-over fragments to the NCBI Ecoli genome (Escherichia coli str. K12 substr. MG1655 U00096.3) with ```--no-overlap --no-dovetail``` options (```--end-to-end --very-sensitive --no-overlap --no-dovetail --no-mixed --no-discordant  --phred33 -I 10 -X 700````) to avoid possible cross-mapping of the experimental genome to that of the carry-over E. coli DNA that is used for calibration.
+
+```S = C / (fragments mapped to E. coli genome)```
+
+Normalized coverage is then calculated as:
+
+```Normalized coverage = (primary_genome_coverage) * S```
+
+The Constant is an arbitrary multiplier, typically 10,000. The resulting file will be comparatively small as a genomic coverage bedgraph file.
 
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
-spikeInRef="/shared/ngs/illumina/henikoff/Bowtie2/Ecoli"
-chromSize="/fh/fast/gottardo_r/yezheng_working/SupplementaryData/hg38/chromSize/hg38.chrom.size"
-
-## bowtie2-build path/to/Ecoli/fasta/Ecoli.fa /path/to/bowtie2Index/Ecoli
-bowtie2 --end-to-end --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700 -p ${cores} -x ${spikeInRef} -1 ${projPath}/fastq/${histName}_R1.fastq.gz -2 ${projPath}/fastq/${histName}_R2.fastq.gz -S $projPath/alignment/sam/${histName}_bowtie2_spikeIn.sam &> $projPath/alignment/sam/bowtie2_summary/${histName}_bowtie2_spikeIn.txt
-
-seqDepthDouble=`samtools view -F 0x04 seqDepth=$((seqDepthDouble/2))
-echo $seqDepth >$projPath/alignment/sam/bowtie2_summary/${histName}_bowtie2_spikeIn.seqDepth
-
-
 if [[ "$seqDepth" -gt "1" ]]; then
     
     mkdir -p $projPath/alignment/bedgraph
@@ -474,51 +608,27 @@ if [[ "$seqDepth" -gt "1" ]]; then
 fi
 ```
 
-## 5.2 Spike-in alignment rate
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
-##=== R command ===## 
-spikeAlign = c()
-for(hist in histList){
-  spikeRes = read.table(paste0(projPath, "/alignment/sam/bowtie2_summary/", hist, "_bowtie2_spikeIn.txt"), header = FALSE, fill = TRUE)
-  alignRate = substr(spikeRes$V1[6], 1, nchar(as.character(spikeRes$V1[6]))-1)
-  histInfo = strsplit(hist, "_")[[1]]
-  spikeAlign = data.frame(seqDepth = spikeRes$V1[1] %>% as.character %>% as.numeric, alignNum = spikeRes$V1[4] %>% as.character %>% as.numeric + spikeRes$V1[5] %>% as.character %>% as.numeric, alignRate = alignRate %>% as.numeric, Histone = histInfo[1], Replicate = histInfo[2])  %>% rbind(spikeAlign, .)
-}
-
-## Generate alignment rate boxplot
-spikeAlign %>% ggplot(aes(x = Histone, y = alignRate, fill = Histone)) +
-    geom_boxplot() +
-    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
-    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
-    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
-    ylab("Spike-in Alignment Rate") +
-    xlab("")
-```
-
-- The percentage of reads mapped to E.coli depends on the number of cells and how broadly distributed the antibody epitope is. Based on our normal exploratory experiments, usually, this percentage range from 0.01% to 11.5%. 
-- Especially for IgG, this percentage is usually much higher (2%-11.5%) than the histone modification. 
-- For even wilder exploratory experiments, we found using a few thousand or even a few hundreds of cells, and this number can soar to 30% or even 70%. However, the percentage drops back to 4% using 65k cells. 
-
-## 5.3 Scaling factor
-
-The scaling factor is defined to be 
-
-Scaling_factor = Scale multiplier/ (Total # of fragments mapped to spike-in genome)
+## 5.1 Scaling factor
 
 ```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
 ##=== R command ===## 
 scaleFactor = c()
 multiplier = 10000
-for(hist in histList){
+for(hist in sampleList){
   spikeDepth = read.table(paste0(projPath, "/alignment/sam/bowtie2_summary/", hist, "_bowtie2_spikeIn.seqDepth"), header = FALSE, fill = TRUE)$V1[1]
   
   histInfo = strsplit(hist, "_")[[1]]
   scaleFactor = data.frame(scaleFactor = multiplier/spikeDepth, Histone = histInfo[1], Replicate = histInfo[2])  %>% rbind(scaleFactor, .)
 }
+scaleFactor$Histone = factor(scaleFactor$Histone, levels = histList)
+left_join(alignDupSummary, scaleFactor, by = c("Histone", "Replicate"))
+```
 
+
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
+##=== R command ===##
 ## Generate sequencing depth boxplot
-scaleFactor %>% ggplot(aes(x = Histone, y = scaleFactor, fill = Histone)) +
+fig6A = scaleFactor %>% ggplot(aes(x = Histone, y = scaleFactor, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
@@ -527,74 +637,26 @@ scaleFactor %>% ggplot(aes(x = Histone, y = scaleFactor, fill = Histone)) +
     ylab("Spike-in Scalling Factor") +
     xlab("")
 
-```
+normDepth = inner_join(scaleFactor, alignResult, by = c("Histone", "Replicate")) %>% mutate(normDepth = MappedFragNum_hg38 * scaleFactor)
 
-
-- There is actually no universal scale factor that can be used on different samples. Instead, the key idea of calibration is 
-
-    (primary_genome_mapped_count_at_bp) * Scaling_factor = 
-
-    (primary_genome_mapped_count_at_bp) * Scale multiplier / (spike-in_genome_total_of_mapped_fragments)
-
-- The underlying assumption is that the primary # genome to spike-in genome ratio per cell is expected to be the same for all samples that use the same number of cells in an experiment comparing treatment. 
-
-- The "scale multiplier" in the above formula can be an arbitrary multiplier (e.g., 10000) to avoid small fractions. 
-
-- The drop of file size should be expected as the input files are the alignment for all the fragments but the output is genome coverage which is like a summary of the fragment alignment results. However, it won't hurt to carefully check the output file.
-
-
-## 5.4 Total number of fragments after normaliztion (seqDepth)
-
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
-##=== R command ===## 
-normDepth = inner_join(scaleFactor, alignResult, by = c("Histone", "Replicate")) %>% mutate(normDepth = alignNum * scaleFactor)
-
-normDepth %>% ggplot(aes(x = Histone, y = normDepth, fill = Histone)) +
+fig6B = normDepth %>% ggplot(aes(x = Histone, y = normDepth, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
     theme_bw(base_size = 20) +
-    ylab("Total number of fragments after normalization") +
+    ylab("Normalization Fragment Count") +
     xlab("") + 
     coord_cartesian(ylim = c(1000000, 130000000))
-
+ggarrange(fig6A, fig6B, ncol = 2)
 ```
-
-## 5.5 ChIPseqSpikeInFree for experiments without spike-ins [Optional]
-
-[ChIPseqSpikeInFree: a ChIP-seq normalization approach to reveal global changes in histone modifications without spike-in](https://academic.oup.com/bioinformatics/article/36/4/1270/5578481) is a novel ChIP-seq normalization method to effectively determine scaling factors for samples across various conditions and treatments, which does not rely on exogenous spike-in chromatin or peak detection to reveal global changes in histone modification occupancy. The installation details can be found on [github](https://github.com/stjude/ChIPseqSpikeInFree).
-
-```{r echo=TRUE, eval = FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
-##=== R command ===## 
-library("ChIPseqSpikeInFree")
-
-bamDir = paste0(projPath, "/alignment/bam")
-metaData = c()
-for(hist in histList){
-  histInfo = strsplit(hist, "_")[[1]] 
-
-  metaData = data.frame(ID = paste0(hist, "_bowtie2.mapped.bam"), ANTIBODY = histInfo[1], GROUP = histInfo[2]) %>% rbind(metaData, .)
-  
-}
-write.table(metaData, file = paste0(projPath, "/alignment/ChIPseqSpikeInFree/metaData.txt"), row.names = FALSE, quote = FALSE, sep = "\t")
-
-metaFile = paste0(projPath, "/alignment/ChIPseqSpikeInFree/metaData.txt")
-bams = paste0(projPath, "/alignment/bam/", metaData$ID)
-ChIPseqSpikeInFree(bamFiles = bams, chromFile = "hg38", metaFile = metaFile, prefix = paste0(projPath, "/alignment/ChIPseqSpikeInFree/SpikeInFree_results"))
-
-```
-
-- [Interpretation of the ChIPseqSpikeInFree output.](https://github.com/stjude/ChIPseqSpikeInFree#interpretation-of-scaling-factor-table)
-
-- [How to use ChIPseqSpikeInFree scaling factor.](https://github.com/stjude/ChIPseqSpikeInFree#how-to-use-chipseqspikein-scaling-factor)
 
 
 # VI. Peak calling
 
 ## 6.1. SEACR
 
-The usage manual of SEACR can be found [here](https://github.com/FredHutch/SEACR/). We have calibrated the fragment frequency with respect to the spike-in, therefore for field 3, we can set the normalization option to be "non". Otherwise, "norm" is recommended.
+The Sparse Enrichment Analysis for CUT&RUN, [SEACR](https://github.com/FredHutch/SEACR/),  package is designed to call peaks and enriched regions from chromatin profiling data with very low backgrounds (i.e., regions with no read coverage) that are typical for CUT&Tag chromatin profiling experiments. SEACR requires bedGraph files from paired-end sequencing as input and defines peaks as contiguous blocks of basepair coverage that do not overlap with blocks of background signal delineated in the IgG control dataset. SEACR is effective for calling both narrow peaks from factor binding sites and broad domains characteristic of some histone modifications. The description of the method is published at [Meers et al. 2019](https://epigeneticsandchromatin.biomedcentral.com/articles/10.1186/s13072-019-0287-4), and the user’s manual is available on [github](https://github.com/FredHutch/SEACR/). Since we have normalized fragment counts with the E. coli read count, we set the normalization option of SEACR to “non”. Otherwise, the “norm” is recommended.
 
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
@@ -616,7 +678,7 @@ bash $seacr $projPath/alignment/bedgraph/${histName}_bowtie2.fragments.normalize
 peakN = c()
 peakWidth = c()
 peakType = c("control", "top0.01")
-for(hist in histList){
+for(hist in sampleList){
   histInfo = strsplit(hist, "_")[[1]]
   if(histInfo[1] != "IgG"){
     for(type in peakType){
@@ -626,46 +688,14 @@ for(hist in histList){
     }
   }
 }
-
-peakN %>% ggplot(aes(x = Histone, y = peakN, fill = Histone)) +
-    geom_boxplot() +
-    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
-    facet_grid(~peakType) +
-    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
-    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
-    ylab("Number of Peaks") +
-    xlab("")
+peakN %>% select(Histone, Replicate, peakType, peakN)
 ```
 
-### 6.1.2 Distribution of the peak length
 
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
-##=== R command ===## 
-peakWidth %>% ggplot(aes(x = Histone, y = width, fill = Histone)) +
-    geom_violin() +
-    facet_grid(Replicate~peakType) +
-    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
-    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
-    ylab("Width of Peaks") +
-    xlab("")
-```
 
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
-##=== R command ===## 
-peakWidth %>% ggplot(aes(x = Histone, y = width, fill = Histone)) +
-    geom_violin() +
-    facet_grid(Replicate~peakType) +
-    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
-    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
-    ylab("Width of Peaks") +
-    xlab("") +
-    coord_cartesian(ylim = c(0, 25000))
-```
+### 6.1.2 Reproducibility of the peak across biological replicates
 
-### 6.1.3 Reproducibility of the peak across biological replicates
+Peak calling on replicate datasets is compared to define reproducible peaks. The top 1% of peaks (ranked by total signal in each block) are selected as high-confidence sites. 
 
 ```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
 ##=== R command ===## 
@@ -691,21 +721,18 @@ for(type in peakType){
 }
 
 peakReprod = left_join(peakN, peakOverlap, by = c("Histone", "peakType")) %>% mutate(peakReprodRate = peakReprod/peakN * 100)
-
-peakReprod %>% ggplot(aes(x = Histone, y = peakReprodRate, fill = Histone, label = round(peakReprodRate, 2))) +
-    geom_bar(stat = "identity") +
-    geom_text(vjust = 0.1) +
-    facet_grid(Replicate~peakType) +
-    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
-    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
-    ylab("% of Peaks Reproduced across Biological Replicate") +
-    xlab("")
+peakReprod %>% select(Histone, Replicate, peakType, peakN, peakReprodNum = peakReprod, peakReprodRate)
 ```
 
-### 6.1.4 FRagment proportion in Peaks regions (FRiPs).
+The reproducibility is calculated by 
 
-- We utilize the SEACR peaks contrasting with IgG controls for illustration.
+``` # peaks overlapping rep1 and rep2/# peaks of rep1 or rep2 * 100``
+
+Therefore, it is sensitive to the total number of peaks called in each replicate.
+
+### 6.1.3 FRagment proportion in Peaks regions (FRiPs).
+
+We calculate the fraction of reads in peaks (FRiPs) as a measure of signal-to-noise, and contrast it to FRiPs in the IgG control dataset for illustration. Although sequencing depths for CUT&Tag are typically only 1-5 million reads, the low background of the method results in high FRiP scores.
 
 ```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
 ##=== R command ===## 
@@ -725,60 +752,72 @@ for(hist in histL){
   }
 }
 
-frip = left_join(inPeakData, alignResult, by = c("Histone", "Replicate")) %>% mutate(frip = inPeakN/alignNum * 100)
+frip = left_join(inPeakData, alignResult, by = c("Histone", "Replicate")) %>% mutate(frip = inPeakN/MappedFragNum_hg38 * 100)
+frip %>% select(Histone, Replicate, SequencingDepth, MappedFragNum_hg38, AlignmentRate_hg38, FragInPeakNum = inPeakN, FRiPs = frip)
+```
 
-frip %>% ggplot(aes(x = Histone, y = frip, fill = Histone, label = round(frip, 2))) +
+### 6.1.4 Visualization of peak number, peak width, peak reproducibility and FRiPs.
+
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=11, fig.height=8}
+fig7A = peakN %>% ggplot(aes(x = Histone, y = peakN, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
-    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
+    facet_grid(~peakType) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.55, option = "magma", alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab("Number of Peaks") +
+    xlab("")
+
+fig7B = peakWidth %>% ggplot(aes(x = Histone, y = width, fill = Histone)) +
+    geom_violin() +
+    facet_grid(Replicate~peakType) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.55, option = "magma", alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    scale_y_continuous(trans = "log", breaks = c(400, 3000, 22000)) +
+    theme_bw(base_size = 20) +
+    ylab("Width of Peaks") +
+    xlab("")
+
+fig7C = peakReprod %>% ggplot(aes(x = Histone, y = peakReprodRate, fill = Histone, label = round(peakReprodRate, 2))) +
+    geom_bar(stat = "identity") +
+    geom_text(vjust = 0.1) +
+    facet_grid(Replicate~peakType) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.55, option = "magma", alpha = 0.8) +
+    scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    theme_bw(base_size = 20) +
+    ylab("% of Peaks Reproduced") +
+    xlab("")
+
+fig7D = frip %>% ggplot(aes(x = Histone, y = frip, fill = Histone, label = round(frip, 2))) +
+    geom_boxplot() +
+    geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
+    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.55, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
     theme_bw(base_size = 20) +
     ylab("% of Fragments in Peaks") +
     xlab("")
 
+ggarrange(fig7A, fig7B, fig7C, fig7D, ncol = 2, nrow=2, common.legend = TRUE, legend="bottom")
+
+
 ```
-
-
-## 6.2. Other peak calling methods.
-
-### 6.2.1 MACS2: [Model-based Analysis of ChIP-Seq (MACS)](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2008-9-9-r137). Installation details can be found [here](https://github.com/taoliu/MACS/wiki).
- 
-```{r, engine = 'bash', eval = FALSE}
-##== linux command ==##
-histName="K27me3"
-controlName="IgG"
-
-mkdir -p $projPath/peakCalling
-macs2 callpeak -t ${projPath}/alignment/bam/${histName}_rep1_bowtie2.mapped.bam \
-      -c ${projPath}/alignment/bam/${controlName}_rep1_bowtie2.mapped.bam \
-      -g hs -f BAMPE -n macs2_peak_q0.1 --outdir $projPath/peakCalling/MACS2 -q 0.1 --keep-dup all 2>${projPath}/peakCalling/MACS2/macs2Peak_summary.txt
-```
- 
-### 6.2.2 Other peak calling methods that are widely used for ChIP-seq data may also be utilized.
-
-- dPeak: [dPeak: High Resolution Identification of Transcription Factor Binding Sites from PET and SET ChIP-Seq Data](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003246)
-
-- MOSAiCS: [A Statistical Framework for the Analysis of ChIP-Seq Data](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4608541/)
 
 
 # VII. Visualization
 
-- [Integrative Genomic Viewer](http://software.broadinstitute.org/software/igv/home) provides web app version and local desktop version. Easy to use.
+Typically we are interested in visualizing a chromatin landscape in regions using a genome browser. The [Integrative Genomic Viewer](http://software.broadinstitute.org/software/igv/home) provides a web app version and a local desktop version that are easy to use. The [UCSC Genome Browser](https://genome.ucsc.edu/) provides the most comprehensive supplementary genome information.
 
-- [UCSC Genome Browser](https://genome.ucsc.edu/) provides the most comprehensive supplementary genome information.
 
-## 7.1. Browser display of bedgraph files after spike-in calibration. 
+## 7.1. Browser display of normalized bedgraph files. 
 
 ![**Figure 4. IgV Web Visualization around region chr7:131,000,000-134,000,000**](figures/chr7.png)
 
 
-- Check pericentromeric regions that contain lots of repeats are a good place to look since signal will naturally be enriched there for all antibody and IgG data.
-
-![**Figure 5. IgV Web Visualization around chr1 pericentromeric region**](figures/chr1_center.png)
 
 ## 7.2. Heatmap visualization on specific regions
 
-We will use the ```computeMatrix``` and ```plotHeatmap``` functions from [deepTools](https://deeptools.readthedocs.io/en/develop/) to generate the heatmap.
+We are also interested in looking at chromatin features at a list of annotated sites, for example histone modification signal at gene promoters.We will use the ```computeMatrix``` and ```plotHeatmap``` functions from [deepTools](https://deeptools.readthedocs.io/en/develop/) to generate the heatmap.
 
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
@@ -789,7 +828,7 @@ bamCoverage -b $projPath/alignment/bam/${histName}.sorted.bam -o $projPath/align
 
 ```
 
-### 7.2.1 Heatmap over transcripts
+### 7.2.1 Heatmap over transcription units
 
 
 ```{r, engine = 'bash', eval = FALSE}
@@ -810,17 +849,23 @@ plotHeatmap -m $projPath/data/hg38_gene/matrix_gene.mat.gz -out $projPath/data/h
 ```
 
 ![**Figure 6. Heatmap of histone enrichment around genes**](figures/Histone_gene.png)
+
 ### 7.2.2. Heatmap on CUT&Tag peaks
+
+We use the midpoint of the signal block returned from SEACR to align signals in heatmaps. The sixth column of the SEACR output is an entry in the form chr:start-end that represents the first and ending bases of the region with the maximum signal of the region. We first generate a new bed file containing this midpoint information in column 6 and use deeptools for the heatmap visualization.
 
 
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
-computeMatrix scale-regions -S $projPath/alignment/bigwig/${histName}_raw.bw \
-              -R $projPath/peakCalling/SEACR/${histName}_seacr_control.peaks.stringent.bed \
-              --skipZeros -o $projPath/peakCalling/SEACR/${histName}_SEACR.mat.gz -p $cores
+awk '{split($6, summit, ":"); split(summit[2], region, "-"); print summit[1]"\t"region[1]"\t"region[2]}' $projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.pe\
+aks.stringent.bed >$projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.peaks.summitRegion.bed
+
+computeMatrix reference-point -S $projPath/alignment/bigwig/${histName}_${repName}_raw.bw \
+              -R $projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.peaks.summitRegion.bed \
+              --skipZeros -o $projPath/peakCalling/SEACR/${histName}_${repName}_SEACR.mat.gz -p $cores -a 3000 -b 3000 --referencePoint center
 
 plotHeatmap -m $projPath/peakCalling/SEACR/${histName}_SEACR.mat.gz -out $projPath/peakCalling/SEACR/${histName}_SEACR_heatmap.png --sortUsing sum --startLabel "Peak Start" -\
--endLabel "Peak End" --xAxisLabel "" --regionsLabel "Peaks" --samplesLabel ${histName}
+-endLabel "Peak End" --xAxisLabel "" --regionsLabel "Peaks" --samplesLabel "${histName} ${repName}"
 ```
 
 ![**Figure 7. Heatmap of histone enrichment in peaks**](figures/Histone_peak.png)
@@ -831,17 +876,6 @@ plotHeatmap -m $projPath/peakCalling/SEACR/${histName}_SEACR.mat.gz -out $projPa
 
 Estimate variance-mean dependence in count data from high-throughput sequencing assays and test for differential expression based on a model using the negative binomial distribution.
 
-- Limma: [limma powers differential expression analyses for RNA-sequencing and microarray studies](https://academic.oup.com/nar/article/43/7/e47/2414268)
-
-Limma is an R package for the analysis of gene expression microarray data, especially
-the use of linear models for analysing designed experiments and the assessment of differential expression. Limma provides the ability to analyse comparisons between many
-RNA targets simultaneously in arbitrary complicated designed experiments. Empirical
-Bayesian methods are used to provide stable results even when the number of arrays
-is small. Limma can be extended to study differential fragment enrichment analysis within peak regions. Notably, limma can deal with both fixed effect model and random effect model.
-
-- edgeR: [Differential Expression Analysis of Multifactor RNA-Seq Experiments With Respect to Biological Variation](https://academic.oup.com/nar/article/40/10/4288/2411520)
-
-Differential expression analysis of RNA-seq expression profiles with biological replication. Implements a range of statistical methodology based on the negative binomial distributions, including empirical Bayes estimation, exact tests, generalized linear models and quasi-likelihood tests. As well as RNA-seq, it be applied to differential signal analysis of other types of genomic data that produce read counts, including ChIP-seq, ATAC-seq, Bisulfite-seq, SAGE and CAGE. edgeR can deal with multifactor problem.
 
 ## 8.1. Create the peak x sample matrix.
 
@@ -908,10 +942,6 @@ head(countMatDiff)
   - Second 4 columns: normalized read counts eliminating library size difference.
   - Remaining columns: differential detection results.
 
-# Conclusion
-
-![**Figure 8. CUT&Tag data processing and analysis.**](figures/CUTTag_Diagram.png)
-
 # References
 
  - Citing this tutorial
@@ -919,4 +949,80 @@ head(countMatDiff)
 ```
 Kaya-Okur HS, Wu SJ, Codomo CA, Pledger ES, Bryson TD, Henikoff JG, Ahmad K, Henikoff S: CUT&Tag for efficient epigenomic profiling of small samples and single cells. Nature Communications 2019 10:1930 (PMID:31036827).
 ```
+
+# Cite this tutorial
+Zheng Y et al (2020). Protocol.io
+
+# IX. Additional Alternatives
+
+
+## 9.1 ChIPseqSpikeInFree for normalizing data without spike-in DNA [Optional]
+
+[ChIPseqSpikeInFree: a ChIP-seq normalization approach to reveal global changes in histone modifications without spike-in](https://academic.oup.com/bioinformatics/article/36/4/1270/5578481) is a novel ChIP-seq normalization method to effectively determine scaling factors for samples across various conditions and treatments, which does not rely on exogenous spike-in chromatin or peak detection to reveal global changes in histone modification occupancy. The installation details can be found on [github](https://github.com/stjude/ChIPseqSpikeInFree).
+
+```{r echo=FALSE, eval = FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
+##=== R command ===## 
+library("ChIPseqSpikeInFree")
+
+bamDir = paste0(projPath, "/alignment/bam")
+metaData = c()
+for(hist in sampleList){
+  histInfo = strsplit(hist, "_")[[1]] 
+
+  metaData = data.frame(ID = paste0(hist, "_bowtie2.mapped.bam"), ANTIBODY = histInfo[1], GROUP = histInfo[2]) %>% rbind(metaData, .)
+  
+}
+write.table(metaData, file = paste0(projPath, "/alignment/ChIPseqSpikeInFree/metaData.txt"), row.names = FALSE, quote = FALSE, sep = "\t")
+
+metaFile = paste0(projPath, "/alignment/ChIPseqSpikeInFree/metaData.txt")
+bams = paste0(projPath, "/alignment/bam/", metaData$ID)
+ChIPseqSpikeInFree(bamFiles = bams, chromFile = "hg38", metaFile = metaFile, prefix = paste0(projPath, "/alignment/ChIPseqSpikeInFree/SpikeInFree_results"))
+
+```
+
+- [Interpretation of the ChIPseqSpikeInFree output.](https://github.com/stjude/ChIPseqSpikeInFree#interpretation-of-scaling-factor-table)
+
+- [How to use ChIPseqSpikeInFree scaling factor.](https://github.com/stjude/ChIPseqSpikeInFree#how-to-use-chipseqspikein-scaling-factor)
+
+## 9.2. Other peak calling methods.
+
+- MACS2: [Model-based Analysis of ChIP-Seq (MACS)](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2008-9-9-r137). Installation details can be found [here](https://github.com/taoliu/MACS/wiki).
+ 
+```{r, engine = 'bash', eval = FALSE}
+##== linux command ==##
+histName="K27me3"
+controlName="IgG"
+
+mkdir -p $projPath/peakCalling
+macs2 callpeak -t ${projPath}/alignment/bam/${histName}_rep1_bowtie2.mapped.bam \
+      -c ${projPath}/alignment/bam/${controlName}_rep1_bowtie2.mapped.bam \
+      -g hs -f BAMPE -n macs2_peak_q0.1 --outdir $projPath/peakCalling/MACS2 -q 0.1 --keep-dup all 2>${projPath}/peakCalling/MACS2/macs2Peak_summary.txt
+```
+ 
+
+- dPeak: [dPeak: High Resolution Identification of Transcription Factor Binding Sites from PET and SET ChIP-Seq Data](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003246)
+
+- MOSAiCS: [A Statistical Framework for the Analysis of ChIP-Seq Data](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4608541/)
+
+
+## 9.3 Other packages for differential analysis of binding sites
+
+- Limma: [limma powers differential expression analyses for RNA-sequencing and microarray studies](https://academic.oup.com/nar/article/43/7/e47/2414268)
+
+Limma is an R package for the analysis of gene expression microarray data, especially
+the use of linear models for analysing designed experiments and the assessment of differential expression. Limma provides the ability to analyse comparisons between many
+RNA targets simultaneously in arbitrary complicated designed experiments. Empirical
+Bayesian methods are used to provide stable results even when the number of arrays
+is small. Limma can be extended to study differential fragment enrichment analysis within peak regions. Notably, limma can deal with both fixed effect model and random effect model.
+
+- edgeR: [Differential Expression Analysis of Multifactor RNA-Seq Experiments With Respect to Biological Variation](https://academic.oup.com/nar/article/40/10/4288/2411520)
+
+Differential expression analysis of RNA-seq expression profiles with biological replication. Implements a range of statistical methodology based on the negative binomial distributions, including empirical Bayes estimation, exact tests, generalized linear models and quasi-likelihood tests. As well as RNA-seq, it be applied to differential signal analysis of other types of genomic data that produce read counts, including ChIP-seq, ATAC-seq, Bisulfite-seq, SAGE and CAGE. edgeR can deal with multifactor problem.
+
+# X. Troubleshooting: Generating your data
+
+This workflow can be followed with your own data and will generate a standardized set of quality-control reports. However, many sequencing facilities do not perform 25x25 PE sequencing, and alternate parameters for trimming and mapping are provided here. Control datasets for non-specific antibody (IgG) profiling or ATAC-seq profiling of your material can also be used for optional analysis detailed here.
+
+Stringent washing with 300 mM NaCl is critical to limit the affinity of Tn5 for exposed DNA. We describe here the need for controlling background Tn5 affinities and describe how our CUT&Tag protocol effectively suppresses this artifact for unambiguous mapping of chromatin epitopes. We present a protocol that can process either native or fixed nuclei and includes alternative methods for DNA isolation. To illustrate the method, we describe a typical experiment, including evaluation of the results using a new metric for peak-calling information. Further, we validate a single-tube format for CUT&Tag that requires no DNA isolation but instead uses tagmented material directly for library amplification. We document critical steps for the CUT&Tag protocol, informed by our experiences, helping users establish this method in their research.
+
 
