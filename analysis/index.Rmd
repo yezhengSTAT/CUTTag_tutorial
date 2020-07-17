@@ -83,6 +83,7 @@ This tutorial is designed for processing and analyzing CUT&Tag data following th
   - chromVAR
   - DESeq2
   - ggpubr
+  - corrplot
   - ChIPseqSpikeInFree [Optional]
   
 ```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
@@ -94,6 +95,7 @@ library(GenomicRanges)
 library(chromVAR) ## For FRiP analysis and differential analysis
 library(DESeq2) ## For differential analysis section
 library(ggpubr) ## For customizing figures
+library(corrplot) ## For correlation plot
 ```
 
 - FastQC(version >= 0.11.9)
@@ -129,7 +131,7 @@ projPath="/path/to/project/where/data/and/results/are/saved"
 
 
 - H3K27me3: 
-  - SH_Hs_K27m3_NX_0918 as replicate 1: GEO accession: GSE145187
+  - SH_Hs_K27m3_NX_0918 as replicate 1: GEO accession: GSE145187, sample ID: GSM4676016
   - SH_Hs_K27m3_Xpc_0107 as replicate 2: GEO accession: GSE145187, SRA entry: SRX7713678
 
 - H3K4me3:
@@ -498,7 +500,7 @@ samtools view -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam | awk -F'\
 ## Collect the fragment size information
 fragLen = c()
 for(hist in sampleList){
-  histInfo = strsplit(hist, "_")[[1]]
+  
   histInfo = strsplit(hist, "_")[[1]]
   fragLen = read.table(paste0(projPath, "/alignment/sam/fragmentLen/", hist, "_fragmentLen.txt"), header = FALSE) %>% mutate(fragLen = V1 %>% as.numeric, fragCount = V2 %>% as.numeric, Weight = as.numeric(V2)/sum(as.numeric(V2)), Histone = histInfo[1], Replicate = histInfo[2], sampleInfo = hist) %>% rbind(fragLen, .) 
 }
@@ -531,11 +533,7 @@ ggarrange(fig5A, fig5B, ncol = 2)
 
 ## 3.5 Assess replicate reproducibility
 
-Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. The genome is split into 500 bp bins, and a Pearson correlation of the log2-transformed values of read counts in each bin is calculated between replicate datasets. Multiple replicates and IgG control datasets are displayed in a hierarchically clustered correlation matrix. 
-
-```{r}
-## Figure is pending...
-```
+Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. For the simplicity of implementation, we will postone this analysis after Section IV when the file format has been converted into fragment bed files.
 
 
 # IV. Alignment results filtering and file format conversion
@@ -574,6 +572,44 @@ awk '$1==$4 && $6-$2 < 1000 {print $0}' $projPath/alignment/bed/${histName}_bowt
 
 ## Only extract the fragment related columns
 cut -f 1,2,6 $projPath/alignment/bed/${histName}_bowtie2.clean.bed | sort -k1,1 -k2,2n -k3,3n  >$projPath/alignment/bed/${histName}_bowtie2.fragments.bed
+```
+
+## 4.3 Assess replicate reproducibility (continue section 3.5)
+
+To study the reproducibility between replicates and across conditions, the genome is split into 500 bp bins, and a Pearson correlation of the log2-transformed values of read counts in each bin is calculated between replicate datasets. Multiple replicates and IgG control datasets are displayed in a hierarchically clustered correlation matrix. 
+
+
+```{r, engine = 'bash', eval = FALSE}
+##== linux command ==##
+## We use the mid point of each fragment to infer which 500bp bins does this fragment belong to.
+binLen=500
+awk -v w=$binLen '{print $1, int(($2 + $3)/(2*w))*w + w/2}' $projPath/alignment/bed/${histName}_bowtie2.fragments.bed | sort -k1,1V -k2,2n | uniq -c | awk -v OFS="\t" '{print $2, $3, $1}' |  sort -k1,1V -k2,2n  >$projPath/alignment/bed/${histName}_bowtie2.fragmentsCount.bin$binLen.bed
+
+```
+
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.height=7}
+
+reprod = c()
+fragCount = NULL
+for(hist in sampleList){
+  
+  if(is.null(fragCount)){
+    
+    fragCount = read.table(paste0(projPath, "/alignment/bed/", hist, "_bowtie2.fragmentsCount.bin500.bed"), header = FALSE) 
+    colnames(fragCount) = c("chrom", "bin", hist)
+  
+  }else{
+    
+    fragCountTmp = read.table(paste0(projPath, "/alignment/bed/", hist, "_bowtie2.fragmentsCount.bin500.bed"), header = FALSE)
+    colnames(fragCountTmp) = c("chrom", "bin", hist)
+    fragCount = full_join(fragCount, fragCountTmp, by = c("chrom", "bin"))
+    
+  }
+}
+
+M = cor(fragCount %>% select(-c("chrom", "bin")) %>% log2(), use = "complete.obs") # %>%  log2())
+
+corrplot(M, method = "color", outline = T, addgrid.col = "darkgray", order="hclust", addrect = 3, rect.col = "black", rect.lwd = 3,cl.pos = "b", tl.col = "indianred4", tl.cex = 1, cl.cex = 1, addCoef.col = "black", number.digits = 2, number.cex = 1, col = colorRampPalette(c("midnightblue","white","darkred"))(100))
 ```
 
 # V. Spike-in calibration 
