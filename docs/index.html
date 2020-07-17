@@ -425,7 +425,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-07-16
+<strong>Last updated:</strong> 2020-07-17
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
@@ -540,16 +540,16 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomyezhengSTATCUTTagtutorialtree1118ace8ae76a1dfa0d38db6fd0b79767d0d66ectargetblank1118acea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/tree/1118ace8ae76a1dfa0d38db6fd0b79767d0d66ec" target="_blank">1118ace</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomyezhengSTATCUTTagtutorialtree891f5466cb24c1af211cca432975ac2208b28c51targetblank891f546a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/tree/891f5466cb24c1af211cca432975ac2208b28c51" target="_blank">891f546</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomyezhengSTATCUTTagtutorialtree1118ace8ae76a1dfa0d38db6fd0b79767d0d66ectargetblank1118acea" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomyezhengSTATCUTTagtutorialtree891f5466cb24c1af211cca432975ac2208b28c51targetblank891f546a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/tree/1118ace8ae76a1dfa0d38db6fd0b79767d0d66ec" target="_blank">1118ace</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/tree/891f5466cb24c1af211cca432975ac2208b28c51" target="_blank">891f546</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -575,6 +575,9 @@ Untracked files:
     Untracked:  fastq/
     Untracked:  fastqFileQC/
     Untracked:  peakCalling/
+
+Unstaged changes:
+    Modified:   analysis/pipeline2.sh
 
 </code></pre>
 <p>
@@ -613,6 +616,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/891f5466cb24c1af211cca432975ac2208b28c51/analysis/index.Rmd" target="_blank">891f546</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-07-17
+</td>
+<td>
+update correlation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/yezhengSTAT/CUTTag_tutorial/7a2792a4ed33fe0ba2b1bdf342be51c8f5b4dc4c/docs/index.html" target="_blank">7a2792a</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-07-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -868,6 +905,7 @@ Start workflowr project.
 <li>chromVAR</li>
 <li>DESeq2</li>
 <li>ggpubr</li>
+<li>corrplot</li>
 <li>ChIPseqSpikeInFree [Optional]</li>
 </ul></li>
 </ul>
@@ -878,7 +916,8 @@ library(viridis)
 library(GenomicRanges)
 library(chromVAR) ## For FRiP analysis and differential analysis
 library(DESeq2) ## For differential analysis section
-library(ggpubr) ## For customizing figures</code></pre>
+library(ggpubr) ## For customizing figures
+library(corrplot) ## For correlation plot</code></pre>
 <ul>
 <li><p>FastQC(version &gt;= 0.11.9)</p></li>
 <li><p>Bowtie2 (version &gt;= 2.3.4.3)</p></li>
@@ -907,7 +946,7 @@ projPath=&quot;/path/to/project/where/data/and/results/are/saved&quot;</code></p
 <ul>
 <li>H3K27me3:
 <ul>
-<li>SH_Hs_K27m3_NX_0918 as replicate 1: GEO accession: GSE145187</li>
+<li>SH_Hs_K27m3_NX_0918 as replicate 1: GEO accession: GSE145187, sample ID: GSM4676016</li>
 <li>SH_Hs_K27m3_Xpc_0107 as replicate 2: GEO accession: GSE145187, SRA entry: SRX7713678</li>
 </ul></li>
 <li>H3K4me3:
@@ -1342,7 +1381,7 @@ samtools view -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam | awk -F&#
 ## Collect the fragment size information
 fragLen = c()
 for(hist in sampleList){
-  histInfo = strsplit(hist, &quot;_&quot;)[[1]]
+  
   histInfo = strsplit(hist, &quot;_&quot;)[[1]]
   fragLen = read.table(paste0(projPath, &quot;/alignment/sam/fragmentLen/&quot;, hist, &quot;_fragmentLen.txt&quot;), header = FALSE) %&gt;% mutate(fragLen = V1 %&gt;% as.numeric, fragCount = V2 %&gt;% as.numeric, Weight = as.numeric(V2)/sum(as.numeric(V2)), Histone = histInfo[1], Replicate = histInfo[2], sampleInfo = hist) %&gt;% rbind(fragLen, .) 
 }
@@ -1412,8 +1451,7 @@ yezhengSTAT
 </div>
 <div id="assess-replicate-reproducibility" class="section level2">
 <h2>3.5 Assess replicate reproducibility</h2>
-<p>Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. The genome is split into 500 bp bins, and a Pearson correlation of the log2-transformed values of read counts in each bin is calculated between replicate datasets. Multiple replicates and IgG control datasets are displayed in a hierarchically clustered correlation matrix.</p>
-<pre class="r"><code>## Figure is pending...</code></pre>
+<p>Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. For the simplicity of implementation, we will postone this analysis after Section IV when the file format has been converted into fragment bed files.</p>
 </div>
 </div>
 <div id="iv.-alignment-results-filtering-and-file-format-conversion" class="section level1">
@@ -1446,6 +1484,85 @@ awk &#39;$1==$4 &amp;&amp; $6-$2 &lt; 1000 {print $0}&#39; $projPath/alignment/b
 
 ## Only extract the fragment related columns
 cut -f 1,2,6 $projPath/alignment/bed/${histName}_bowtie2.clean.bed | sort -k1,1 -k2,2n -k3,3n  &gt;$projPath/alignment/bed/${histName}_bowtie2.fragments.bed</code></pre>
+</div>
+<div id="assess-replicate-reproducibility-continue-section-3.5" class="section level2">
+<h2>4.3 Assess replicate reproducibility (continue section 3.5)</h2>
+<p>To study the reproducibility between replicates and across conditions, the genome is split into 500 bp bins, and a Pearson correlation of the log2-transformed values of read counts in each bin is calculated between replicate datasets. Multiple replicates and IgG control datasets are displayed in a hierarchically clustered correlation matrix.</p>
+<pre class="bash"><code>##== linux command ==##
+## We use the mid point of each fragment to infer which 500bp bins does this fragment belong to.
+binLen=500
+awk -v w=$binLen &#39;{print $1, int(($2 + $3)/(2*w))*w + w/2}&#39; $projPath/alignment/bed/${histName}_bowtie2.fragments.bed | sort -k1,1V -k2,2n | uniq -c | awk -v OFS=&quot;\t&quot; &#39;{print $2, $3, $1}&#39; |  sort -k1,1V -k2,2n  &gt;$projPath/alignment/bed/${histName}_bowtie2.fragmentsCount.bin$binLen.bed
+</code></pre>
+<pre class="r"><code>reprod = c()
+fragCount = NULL
+for(hist in sampleList){
+  
+  if(is.null(fragCount)){
+    
+    fragCount = read.table(paste0(projPath, &quot;/alignment/bed/&quot;, hist, &quot;_bowtie2.fragmentsCount.bin500.bed&quot;), header = FALSE) 
+    colnames(fragCount) = c(&quot;chrom&quot;, &quot;bin&quot;, hist)
+  
+  }else{
+    
+    fragCountTmp = read.table(paste0(projPath, &quot;/alignment/bed/&quot;, hist, &quot;_bowtie2.fragmentsCount.bin500.bed&quot;), header = FALSE)
+    colnames(fragCountTmp) = c(&quot;chrom&quot;, &quot;bin&quot;, hist)
+    fragCount = full_join(fragCount, fragCountTmp, by = c(&quot;chrom&quot;, &quot;bin&quot;))
+    
+  }
+}
+
+M = cor(fragCount %&gt;% select(-c(&quot;chrom&quot;, &quot;bin&quot;)) %&gt;% log2(), use = &quot;complete.obs&quot;) # %&gt;%  log2())
+
+corrplot(M, method = &quot;color&quot;, outline = T, addgrid.col = &quot;darkgray&quot;, order=&quot;hclust&quot;, addrect = 3, rect.col = &quot;black&quot;, rect.lwd = 3,cl.pos = &quot;b&quot;, tl.col = &quot;indianred4&quot;, tl.cex = 1, cl.cex = 1, addCoef.col = &quot;black&quot;, number.digits = 2, number.cex = 1, col = colorRampPalette(c(&quot;midnightblue&quot;,&quot;white&quot;,&quot;darkred&quot;))(100))</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-21-1">
+Past versions of unnamed-chunk-21-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-21-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/5346b8e4b20c8f304e18f0c1efb4643a5b4dd614/docs/figure/index.Rmd/unnamed-chunk-21-1.png" target="_blank">5346b8e</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-06-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/8db752dee6286a2e0931b1ba6832bc06868d37b7/docs/figure/index.Rmd/unnamed-chunk-21-1.png" target="_blank">8db752d</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-06-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 <div id="v.-spike-in-calibration" class="section level1">
@@ -1507,13 +1624,13 @@ fig6B = normDepth %&gt;% ggplot(aes(x = Histone, y = normDepth, fill = Histone))
     xlab(&quot;&quot;) + 
     coord_cartesian(ylim = c(1000000, 130000000))
 ggarrange(fig6A, fig6B, ncol = 2, common.legend = TRUE, legend=&quot;bottom&quot;)</code></pre>
-<p><img src="figure/index.Rmd/unnamed-chunk-23-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="figure/index.Rmd/unnamed-chunk-24-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-23-1">
-Past versions of unnamed-chunk-23-1.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-24-1">
+Past versions of unnamed-chunk-24-1.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-23-1" class="collapse">
+<div id="fig-unnamed-chunk-24-1" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1532,7 +1649,7 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/1118ace8ae76a1dfa0d38db6fd0b79767d0d66ec/docs/figure/index.Rmd/unnamed-chunk-23-1.png" target="_blank">1118ace</a>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/7a2792a4ed33fe0ba2b1bdf342be51c8f5b4dc4c/docs/figure/index.Rmd/unnamed-chunk-24-1.png" target="_blank">7a2792a</a>
 </td>
 <td>
 yezhengSTAT
@@ -1543,13 +1660,24 @@ yezhengSTAT
 </tr>
 <tr>
 <td>
-<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/5346b8e4b20c8f304e18f0c1efb4643a5b4dd614/docs/figure/index.Rmd/unnamed-chunk-23-1.png" target="_blank">5346b8e</a>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/5346b8e4b20c8f304e18f0c1efb4643a5b4dd614/docs/figure/index.Rmd/unnamed-chunk-24-1.png" target="_blank">5346b8e</a>
 </td>
 <td>
 yezhengSTAT
 </td>
 <td>
 2020-06-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/8db752dee6286a2e0931b1ba6832bc06868d37b7/docs/figure/index.Rmd/unnamed-chunk-24-1.png" target="_blank">8db752d</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-06-01
 </td>
 </tr>
 </tbody>
@@ -1702,66 +1830,7 @@ fig7D = frip %&gt;% ggplot(aes(x = Histone, y = frip, fill = Histone, label = ro
     xlab(&quot;&quot;)
 
 ggarrange(fig7A, fig7B, fig7C, fig7D, ncol = 2, nrow=2, common.legend = TRUE, legend=&quot;bottom&quot;)</code></pre>
-<p><img src="figure/index.Rmd/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-28-1">
-Past versions of unnamed-chunk-28-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-28-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/1118ace8ae76a1dfa0d38db6fd0b79767d0d66ec/docs/figure/index.Rmd/unnamed-chunk-28-1.png" target="_blank">1118ace</a>
-</td>
-<td>
-yezhengSTAT
-</td>
-<td>
-2020-07-16
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/5346b8e4b20c8f304e18f0c1efb4643a5b4dd614/docs/figure/index.Rmd/unnamed-chunk-28-1.png" target="_blank">5346b8e</a>
-</td>
-<td>
-yezhengSTAT
-</td>
-<td>
-2020-06-07
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/8db752dee6286a2e0931b1ba6832bc06868d37b7/docs/figure/index.Rmd/unnamed-chunk-28-1.png" target="_blank">8db752d</a>
-</td>
-<td>
-yezhengSTAT
-</td>
-<td>
-2020-06-01
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/index.Rmd/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 </div>
@@ -1996,15 +2065,16 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] ggpubr_0.4.0                DESeq2_1.28.1              
- [3] SummarizedExperiment_1.18.2 DelayedArray_0.14.0        
- [5] matrixStats_0.56.0          Biobase_2.48.0             
- [7] chromVAR_1.10.0             GenomicRanges_1.40.0       
- [9] GenomeInfoDb_1.24.2         IRanges_2.22.2             
-[11] S4Vectors_0.26.1            BiocGenerics_0.34.0        
-[13] viridis_0.5.1               viridisLite_0.3.0          
-[15] ggplot2_3.3.0               stringr_1.4.0              
-[17] dplyr_0.8.5                 workflowr_1.6.2            
+ [1] corrplot_0.84               ggpubr_0.4.0               
+ [3] DESeq2_1.28.1               SummarizedExperiment_1.18.2
+ [5] DelayedArray_0.14.0         matrixStats_0.56.0         
+ [7] Biobase_2.48.0              chromVAR_1.10.0            
+ [9] GenomicRanges_1.40.0        GenomeInfoDb_1.24.2        
+[11] IRanges_2.22.2              S4Vectors_0.26.1           
+[13] BiocGenerics_0.34.0         viridis_0.5.1              
+[15] viridisLite_0.3.0           ggplot2_3.3.0              
+[17] stringr_1.4.0               dplyr_0.8.5                
+[19] workflowr_1.6.2            
 
 loaded via a namespace (and not attached):
   [1] colorspace_1.4-1            ggsignif_0.6.0             
