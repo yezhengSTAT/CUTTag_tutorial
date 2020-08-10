@@ -1,6 +1,6 @@
 ---
 title: "CUT&Tag Data Processing and Analysis Tutorial"
-author: Ye Zheng, Kami Ahmand
+author: Ye Zheng, Kami Ahmad, Steven Henikoff
 site: workflowr::wflow_site
 output:
   workflowr::wflow_html:
@@ -40,7 +40,7 @@ editor_options:
 
 *File creation: March 13, 2020*  
 
-*Update: July 16, 2020* 
+*Update: Aug 10, 2020* 
 
 **Approximate time: 60 - 120 minutes**
 
@@ -131,7 +131,7 @@ projPath="/path/to/project/where/data/and/results/are/saved"
 
 
 - H3K27me3: 
-  - SH_Hs_K27m3_NX_0918 as replicate 1: GEO accession: GSE145187, sample ID: GSM4676016
+  - SH_Hs_K27m3_NX_0918 as replicate 1: GEO accession: GSE145187, SRA entry: SRX8754646
   - SH_Hs_K27m3_Xpc_0107 as replicate 2: GEO accession: GSE145187, SRA entry: SRX7713678
 
 - H3K4me3:
@@ -215,11 +215,9 @@ cat ${projPath}/data/${histName}/*_R2_*.fastq.gz >${projPath}/fastq/${histName}_
 ## 3.1. Bowtie2 alignment [required]
 
 
-The structure of  CUT&Tag insert libraries with the sequence of adapters is shown below.
-```
-TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG-insert-CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
-AGCAGCCGTCGCAGTCTACACATATTCTCTGTC-insert-GACAGAGAATATGTGTAGAGGCTCGGGTGCTCTG
-```
+The structure of CUT&Tag insert libraries with Tn5 adapters and barcoded PCR primers  is shown below:
+
+![**Figure 4. CUT&Tag insert libraries with the sequence of adapters.**](figures/BarcodedCnTLibrary.png)
 
 Our standard pipeline is to perform single-index 25x25 PE Illumina sequencing on up to 90 pooled samples on a single HiSeq 2500 flowcell, where each sample has a unique PCR primer barcode. Amounts for each library are adjusted to provide ~5 million paired-end reads, which provides high-quality profiling for abundant chromatin features with a specific and high-yield antibody. Less abundant features typically require fewer reads, while lower-quality antibodies may increase the number of reads needed for generating robust chromatin profiles. A thorough discussion of feature recall and sequencing depths for CUT&Tag has been published (Kaya-Okur et al 2020).
 
@@ -607,7 +605,7 @@ for(hist in sampleList){
   }
 }
 
-M = cor(fragCount %>% select(-c("chrom", "bin")) %>% log2(), use = "complete.obs") # %>%  log2())
+M = cor(fragCount %>% select(-c("chrom", "bin")) %>% log2(), use = "complete.obs") 
 
 corrplot(M, method = "color", outline = T, addgrid.col = "darkgray", order="hclust", addrect = 3, rect.col = "black", rect.lwd = 3,cl.pos = "b", tl.col = "indianred4", tl.cex = 1, cl.cex = 1, addCoef.col = "black", number.digits = 2, number.cex = 1, col = colorRampPalette(c("midnightblue","white","darkred"))(100))
 ```
@@ -844,7 +842,7 @@ Typically we are interested in visualizing a chromatin landscape in regions usin
 
 ## 7.1. Browser display of normalized bedgraph files. 
 
-![**Figure 4. IgV Web Visualization around region chr7:131,000,000-134,000,000**](figures/chr7.png)
+![**Figure 5. IgV Web Visualization around region chr7:131,000,000-134,000,000**](figures/chr7.png)
 
 
 
@@ -881,7 +879,7 @@ plotHeatmap -m $projPath/data/hg38_gene/matrix_gene.mat.gz -out $projPath/data/h
 
 ```
 
-![**Figure 5. Heatmap of histone enrichment around genes**](figures/Histone_gene.png)
+![**Figure 6. Heatmap of histone enrichment around genes**](figures/Histone_gene.png)
 
 ### 7.2.2. Heatmap on CUT&Tag peaks
 
@@ -901,7 +899,7 @@ plotHeatmap -m $projPath/peakCalling/SEACR/${histName}_SEACR.mat.gz -out $projPa
 -endLabel "Peak End" --xAxisLabel "" --regionsLabel "Peaks" --samplesLabel "${histName} ${repName}"
 ```
 
-![**Figure 6. Heatmap of histone enrichment in peaks**](figures/Histone_peak.png)
+![**Figure 7. Heatmap of histone enrichment in peaks**](figures/Histone_peak.png)
 
 # VIII. Differential analysis
 
