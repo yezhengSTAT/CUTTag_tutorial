@@ -68,7 +68,7 @@ This tutorial is designed for processing and analyzing CUT&Tag data following th
 
 ## 1.3 CUT&Tag data processing and analysis outline.
 
-![**Figure 2. CUT&Tag data processing and analysis.**](figures/CUTTag_Diagram.png)
+![**Figure 2. CUT&Tag data processing and analysis.**](figures/CUTTag_Tuto_Diagram.png)
 
 ## 1.4. Requirements
 
