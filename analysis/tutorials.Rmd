@@ -1,6 +1,6 @@
 ---
 title: "CUT&Tag Data Processing and Analysis Tutorial"
-author: Ye Zheng, Kami Ahmand
+author: Ye Zheng, Kami Ahmad, Steven Henikoff
 site: workflowr::wflow_site
 output:
   workflowr::wflow_html:
@@ -40,7 +40,7 @@ editor_options:
 
 *File creation: March 13, 2020*  
 
-*Update: July 15, 2020* 
+*Update: Aug 10, 2020* 
 
 **Approximate time: 60 - 120 minutes**
 
@@ -83,6 +83,7 @@ This tutorial is designed for processing and analyzing CUT&Tag data following th
   - chromVAR
   - DESeq2
   - ggpubr
+  - corrplot
   - ChIPseqSpikeInFree [Optional]
   
 ```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
@@ -94,6 +95,7 @@ library(GenomicRanges)
 library(chromVAR) ## For FRiP analysis and differential analysis
 library(DESeq2) ## For differential analysis section
 library(ggpubr) ## For customizing figures
+library(corrplot) ## For correlation plot
 ```
 
 - FastQC(version >= 0.11.9)
@@ -129,7 +131,7 @@ projPath="/path/to/project/where/data/and/results/are/saved"
 
 
 - H3K27me3: 
-  - SH_Hs_K27m3_NX_0918 as replicate 1: GEO accession: GSE145187
+  - SH_Hs_K27m3_NX_0918 as replicate 1: GEO accession: GSE145187, SRA entry: SRX8754646
   - SH_Hs_K27m3_Xpc_0107 as replicate 2: GEO accession: GSE145187, SRA entry: SRX7713678
 
 - H3K4me3:
@@ -185,9 +187,9 @@ $projPath/tools/FastQC/fastqc -o ${projPath}/fastqFileQC/${histName} -f fastq ${
 Quality check reference: [https://www.bioinformatics.babraham.ac.uk/projects/fastqc/bad_sequence_fastqc.html](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/bad_sequence_fastqc.html)
 
 
-![**Figure 2. Per base sequence content fails the FastQC quality check.**](figures/R1_sequenceContent.png)
+![**Figure 3. Per base sequence content fails the FastQC quality check.**](figures/R1_sequenceContent.png)
 
-** The discordant sequence content at the begining of the reads are common phenomenon for CUT&Tag reads. Failing to pass the Per base seuqnence content does not mean your data failed.**
+**The discordant sequence content at the begining of the reads are common phenomenon for CUT&Tag reads. Failing to pass the Per base seuqnence content does not mean your data failed.**
 
 - It can be due to the Tn5 preference.
 
@@ -213,12 +215,9 @@ cat ${projPath}/data/${histName}/*_R2_*.fastq.gz >${projPath}/fastq/${histName}_
 ## 3.1. Bowtie2 alignment [required]
 
 
-The structure of CUT&Tag tagmented libraries is shown below.
-```
-TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG-insert-CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
-AGCAGCCGTCGCAGTCTACACATATTCTCTGTC-insert-GACAGAGAATATGTGTAGAGGCTCGGGTGCTCTG
-```
-Figure 2: CUT&Tag insert libraries with the sequence of adapters.
+The structure of CUT&Tag insert libraries with Tn5 adapters and barcoded PCR primers  is shown below:
+
+![**Figure 4. CUT&Tag insert libraries with the sequence of adapters.**](figures/BarcodedCnTLibrary.png)
 
 Our standard pipeline is to perform single-index 25x25 PE Illumina sequencing on up to 90 pooled samples on a single HiSeq 2500 flowcell, where each sample has a unique PCR primer barcode. Amounts for each library are adjusted to provide ~5 million paired-end reads, which provides high-quality profiling for abundant chromatin features with a specific and high-yield antibody. Less abundant features typically require fewer reads, while lower-quality antibodies may increase the number of reads needed for generating robust chromatin profiles. A thorough discussion of feature recall and sequencing depths for CUT&Tag has been published (Kaya-Okur et al 2020).
 
@@ -351,26 +350,26 @@ alignSummary
 ```
 
 ### 3.2.4 Visualizing the sequencing depth and alignment results.
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=11, fig.height=8}
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=12, fig.height=8}
 ##=== R command ===## 
 ## Generate sequencing depth boxplot
-fig3A = alignResult %>% ggplot(aes(x = Histone, y = SequencingDepth, fill = Histone)) +
+fig3A = alignResult %>% ggplot(aes(x = Histone, y = SequencingDepth/1000000, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
-    ylab("Sequencing Depth") +
+    theme_bw(base_size = 18) +
+    ylab("Sequencing Depth per Million") +
     xlab("") + 
-    ggtitle("A. Sequencing Depth of Samples in Study")
+    ggtitle("A. Sequencing Depth")
 
-fig3B = alignResult %>% ggplot(aes(x = Histone, y = MappedFragNum_hg38, fill = Histone)) +
+fig3B = alignResult %>% ggplot(aes(x = Histone, y = MappedFragNum_hg38/1000000, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
-    ylab("# of Mapped Fragments") +
+    theme_bw(base_size = 18) +
+    ylab("Mapped Fragments per Million") +
     xlab("") +
     ggtitle("B. Alignable Fragment (hg38)")
 
@@ -379,7 +378,7 @@ fig3C = alignResult %>% ggplot(aes(x = Histone, y = AlignmentRate_hg38, fill = H
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
+    theme_bw(base_size = 18) +
     ylab("% of Mapped Fragments") +
     xlab("") +
     ggtitle("C. Alignment Rate (hg38)")
@@ -389,7 +388,7 @@ fig3D = spikeAlign %>% ggplot(aes(x = Histone, y = AlignmentRate_spikeIn, fill =
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
+    theme_bw(base_size = 18) +
     ylab("Spike-in Alignment Rate") +
     xlab("") +
     ggtitle("D. Alignment Rate (E.coli)")
@@ -447,7 +446,7 @@ alignDupSummary
 
 - Unique fragment number is calculated by the MappedFragNum_hg38 * (1-DuplicationRate/100).
 
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=11, fig.height=8}
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=13, fig.height=8}
 ##=== R command ===## 
 ## generate boxplot figure for the  duplication rate
 fig4A = dupResult %>% ggplot(aes(x = Histone, y = DuplicationRate, fill = Histone)) +
@@ -455,30 +454,28 @@ fig4A = dupResult %>% ggplot(aes(x = Histone, y = DuplicationRate, fill = Histon
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
+    theme_bw(base_size = 18) +
     ylab("Duplication Rate (*100%)") +
-    xlab("") +
-    ggtitle("A. Duplication Rate")
+    xlab("") 
 
 fig4B = dupResult %>% ggplot(aes(x = Histone, y = EstimatedLibrarySize, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
+    theme_bw(base_size = 18) +
     ylab("Estimated Library Size") +
-    xlab("") +
-    ggtitle("B. Estimated Library Size")
+    xlab("") 
 
 fig4C = dupResult %>% ggplot(aes(x = Histone, y = UniqueFragNum, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
+    theme_bw(base_size = 18) +
     ylab("# of Unique Fragments") +
-    xlab("") +
-    ggtitle("C. Number of Unique Fragments")
+    xlab("")
+
 ggarrange(fig4A, fig4B, fig4C, ncol = 3, common.legend = TRUE, legend="bottom")
 ```
 
@@ -496,12 +493,12 @@ mkdir -p $projPath/alignment/sam/fragmentLen
 samtools view -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam | awk -F'\t' 'function abs(x){return ((x < 0.0) ? -x : x)} {print abs($9)}' | sort | uniq -c | awk -v OFS="\t" '{print $2, $1/2}' >$projPath/alignment/sam/fragmentLen/${histName}_fragmentLen.txt
 ```
 
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=11, fig.height=8}
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=15, fig.height=8}
 ##=== R command ===## 
 ## Collect the fragment size information
 fragLen = c()
 for(hist in sampleList){
-  histInfo = strsplit(hist, "_")[[1]]
+  
   histInfo = strsplit(hist, "_")[[1]]
   fragLen = read.table(paste0(projPath, "/alignment/sam/fragmentLen/", hist, "_fragmentLen.txt"), header = FALSE) %>% mutate(fragLen = V1 %>% as.numeric, fragCount = V2 %>% as.numeric, Weight = as.numeric(V2)/sum(as.numeric(V2)), Histone = histInfo[1], Replicate = histInfo[2], sampleInfo = hist) %>% rbind(fragLen, .) 
 }
@@ -534,11 +531,7 @@ ggarrange(fig5A, fig5B, ncol = 2)
 
 ## 3.5 Assess replicate reproducibility
 
-Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. The genome is split into 500 bp bins, and a Pearson correlation of the log2-transformed values of read counts in each bin is calculated between replicate datasets. Multiple replicates and IgG control datasets are displayed in a hierarchically clustered correlation matrix. 
-
-```{r}
-## Figure is pending...
-```
+Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. For the simplicity of implementation, we will postone this analysis after Section IV when the file format has been converted into fragment bed files.
 
 
 # IV. Alignment results filtering and file format conversion
@@ -577,6 +570,44 @@ awk '$1==$4 && $6-$2 < 1000 {print $0}' $projPath/alignment/bed/${histName}_bowt
 
 ## Only extract the fragment related columns
 cut -f 1,2,6 $projPath/alignment/bed/${histName}_bowtie2.clean.bed | sort -k1,1 -k2,2n -k3,3n  >$projPath/alignment/bed/${histName}_bowtie2.fragments.bed
+```
+
+## 4.3 Assess replicate reproducibility (continue section 3.5)
+
+To study the reproducibility between replicates and across conditions, the genome is split into 500 bp bins, and a Pearson correlation of the log2-transformed values of read counts in each bin is calculated between replicate datasets. Multiple replicates and IgG control datasets are displayed in a hierarchically clustered correlation matrix. 
+
+
+```{r, engine = 'bash', eval = FALSE}
+##== linux command ==##
+## We use the mid point of each fragment to infer which 500bp bins does this fragment belong to.
+binLen=500
+awk -v w=$binLen '{print $1, int(($2 + $3)/(2*w))*w + w/2}' $projPath/alignment/bed/${histName}_bowtie2.fragments.bed | sort -k1,1V -k2,2n | uniq -c | awk -v OFS="\t" '{print $2, $3, $1}' |  sort -k1,1V -k2,2n  >$projPath/alignment/bed/${histName}_bowtie2.fragmentsCount.bin$binLen.bed
+
+```
+
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.height=7}
+
+reprod = c()
+fragCount = NULL
+for(hist in sampleList){
+  
+  if(is.null(fragCount)){
+    
+    fragCount = read.table(paste0(projPath, "/alignment/bed/", hist, "_bowtie2.fragmentsCount.bin500.bed"), header = FALSE) 
+    colnames(fragCount) = c("chrom", "bin", hist)
+  
+  }else{
+    
+    fragCountTmp = read.table(paste0(projPath, "/alignment/bed/", hist, "_bowtie2.fragmentsCount.bin500.bed"), header = FALSE)
+    colnames(fragCountTmp) = c("chrom", "bin", hist)
+    fragCount = full_join(fragCount, fragCountTmp, by = c("chrom", "bin"))
+    
+  }
+}
+
+M = cor(fragCount %>% select(-c("chrom", "bin")) %>% log2(), use = "complete.obs") 
+
+corrplot(M, method = "color", outline = T, addgrid.col = "darkgray", order="hclust", addrect = 3, rect.col = "black", rect.lwd = 3,cl.pos = "b", tl.col = "indianred4", tl.cex = 1, cl.cex = 1, addCoef.col = "black", number.digits = 2, number.cex = 1, col = colorRampPalette(c("midnightblue","white","darkred"))(100))
 ```
 
 # V. Spike-in calibration 
@@ -625,7 +656,7 @@ left_join(alignDupSummary, scaleFactor, by = c("Histone", "Replicate"))
 ```
 
 
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=10, fig.height=8}
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=13, fig.height=8}
 ##=== R command ===##
 ## Generate sequencing depth boxplot
 fig6A = scaleFactor %>% ggplot(aes(x = Histone, y = scaleFactor, fill = Histone)) +
@@ -648,7 +679,7 @@ fig6B = normDepth %>% ggplot(aes(x = Histone, y = normDepth, fill = Histone)) +
     ylab("Normalization Fragment Count") +
     xlab("") + 
     coord_cartesian(ylim = c(1000000, 130000000))
-ggarrange(fig6A, fig6B, ncol = 2)
+ggarrange(fig6A, fig6B, ncol = 2, common.legend = TRUE, legend="bottom")
 ```
 
 
@@ -758,14 +789,14 @@ frip %>% select(Histone, Replicate, SequencingDepth, MappedFragNum_hg38, Alignme
 
 ### 6.1.4 Visualization of peak number, peak width, peak reproducibility and FRiPs.
 
-```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=11, fig.height=8}
+```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=13, fig.height=10}
 fig7A = peakN %>% ggplot(aes(x = Histone, y = peakN, fill = Histone)) +
     geom_boxplot() +
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     facet_grid(~peakType) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.55, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
+    theme_bw(base_size = 18) +
     ylab("Number of Peaks") +
     xlab("")
 
@@ -775,7 +806,7 @@ fig7B = peakWidth %>% ggplot(aes(x = Histone, y = width, fill = Histone)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.55, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
     scale_y_continuous(trans = "log", breaks = c(400, 3000, 22000)) +
-    theme_bw(base_size = 20) +
+    theme_bw(base_size = 18) +
     ylab("Width of Peaks") +
     xlab("")
 
@@ -785,7 +816,7 @@ fig7C = peakReprod %>% ggplot(aes(x = Histone, y = peakReprodRate, fill = Histon
     facet_grid(Replicate~peakType) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.55, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
+    theme_bw(base_size = 18) +
     ylab("% of Peaks Reproduced") +
     xlab("")
 
@@ -794,7 +825,7 @@ fig7D = frip %>% ggplot(aes(x = Histone, y = frip, fill = Histone, label = round
     geom_jitter(aes(color = Replicate), position = position_jitter(0.15)) +
     scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.55, option = "magma", alpha = 0.8) +
     scale_color_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    theme_bw(base_size = 20) +
+    theme_bw(base_size = 18) +
     ylab("% of Fragments in Peaks") +
     xlab("")
 
@@ -811,7 +842,7 @@ Typically we are interested in visualizing a chromatin landscape in regions usin
 
 ## 7.1. Browser display of normalized bedgraph files. 
 
-![**Figure 4. IgV Web Visualization around region chr7:131,000,000-134,000,000**](figures/chr7.png)
+![**Figure 5. IgV Web Visualization around region chr7:131,000,000-134,000,000**](figures/chr7.png)
 
 
 
@@ -943,11 +974,12 @@ head(countMatDiff)
   - Remaining columns: differential detection results.
 
 # References
-
- - Citing this tutorial
-
+ 
 ```
 Kaya-Okur HS, Wu SJ, Codomo CA, Pledger ES, Bryson TD, Henikoff JG, Ahmad K, Henikoff S: CUT&Tag for efficient epigenomic profiling of small samples and single cells. Nature Communications 2019 10:1930 (PMID:31036827).
+```
+```
+Meers, M.P., Tenenbaum, D. & Henikoff, S. Peak calling by Sparse Enrichment Analysis for CUT&RUN chromatin profiling. Epigenetics & Chromatin 12, 42 (2019). https://doi.org/10.1186/s13072-019-0287-4
 ```
 
 # Cite this tutorial

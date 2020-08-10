@@ -1,4 +1,7 @@
-# histName=$1 #"K27me3"
+#!/bin/bash
+
+histName=$1 #"K27me3"
+
 projPath="/fh/fast/gottardo_r/yezheng_working/cuttag/CUTTag_tutorial"
 
 # ## 0. merge technical replicate
@@ -43,6 +46,10 @@ projPath="/fh/fast/gottardo_r/yezheng_working/cuttag/CUTTag_tutorial"
 # bedtools bamtobed -i $projPath/alignment/bam/${histName}_bowtie2.mapped.bam -bedpe >$projPath/alignment/bed/${histName}_bowtie2.bed
 # awk '$1==$4 && $6-$2 < 1000 {print $0}' $projPath/alignment/bed/${histName}_bowtie2.bed >$projPath/alignment/bed/${histName}_bowtie2.clean.bed
 # cut -f 1,2,6 $projPath/alignment/bed/${histName}_bowtie2.clean.bed | sort -k1,1 -k2,2n -k3,3n  >$projPath/alignment/bed/${histName}_bowtie2.fragments.bed
+
+## replicate reproducibility analysis
+binLen=500
+awk -v w=$binLen '{print $1, int(($2 + $3)/(2*w))*w + w/2}' $projPath/alignment/bed/${histName}_bowtie2.fragments.bed | sort -k1,1V -k2,2n | uniq -c | awk -v OFS="\t" '{print $2, $3, $1}' |  sort -k1,1V -k2,2n  >$projPath/alignment/bed/${histName}_bowtie2.fragmentsCount.bin$binLen.bed
 
 
 ## 4. Spike-in calibration
@@ -96,7 +103,7 @@ projPath="/fh/fast/gottardo_r/yezheng_working/cuttag/CUTTag_tutorial"
 
 ## deeptools heatmap visualization
 # ml SAMtools/1.10-foss-2016b
-ml deepTools/3.3.1-foss-2016b-Python-3.7.4
+# ml deepTools/3.3.1-foss-2016b-Python-3.7.4
 
 ## convert into bigwig files
 # mkdir -p $projPath/alignment/bigwig
@@ -118,12 +125,12 @@ ml deepTools/3.3.1-foss-2016b-Python-3.7.4
 # plotHeatmap -m $projPath/data/hg38_gene/matrix_gene.mat.gz -out $projPath/data/hg38_gene/Histone_gene.png --sortUsing sum
 
 ## Peak
-histName=$1
-repName=$2
-awk '{split($6, summit, ":"); split(summit[2], region, "-"); print summit[1]"\t"region[1]"\t"region[2]}' $projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.peaks.stringent.bed >$projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.peaks.summitRegion.bed
+# histName=$1
+# repName=$2
+# awk '{split($6, summit, ":"); split(summit[2], region, "-"); print summit[1]"\t"region[1]"\t"region[2]}' $projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.peaks.stringent.bed >$projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.peaks.summitRegion.bed
 
-computeMatrix reference-point -S $projPath/alignment/bigwig/${histName}_${repName}_raw.bw \
-	      -R $projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.peaks.summitRegion.bed \
-              --skipZeros -o $projPath/peakCalling/SEACR/${histName}_${repName}_SEACR.mat.gz -p 4 -a 3000 -b 3000 --referencePoint center
+# computeMatrix reference-point -S $projPath/alignment/bigwig/${histName}_${repName}_raw.bw \
+# 	      -R $projPath/peakCalling/SEACR/${histName}_${repName}_seacr_control.peaks.summitRegion.bed \
+#               --skipZeros -o $projPath/peakCalling/SEACR/${histName}_${repName}_SEACR.mat.gz -p 4 -a 3000 -b 3000 --referencePoint center
 
-plotHeatmap -m $projPath/peakCalling/SEACR/${histName}_${repName}_SEACR.mat.gz -out $projPath/peakCalling/SEACR/${histName}_${repName}_SEACR_heatmap.png --sortUsing sum --startLabel "Peak Start" --endLabel "Peak End" --xAxisLabel "" --regionsLabel "Peaks" --samplesLabel "${histName} ${repName}"
+# plotHeatmap -m $projPath/peakCalling/SEACR/${histName}_${repName}_SEACR.mat.gz -out $projPath/peakCalling/SEACR/${histName}_${repName}_SEACR_heatmap.png --sortUsing sum --startLabel "Peak Start" --endLabel "Peak End" --xAxisLabel "" --regionsLabel "Peaks" --samplesLabel "${histName} ${repName}"
