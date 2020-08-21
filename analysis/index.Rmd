@@ -258,7 +258,8 @@ chromSize="/fh/fast/gottardo_r/yezheng_working/SupplementaryData/hg38/chromSize/
 ## bowtie2-build path/to/Ecoli/fasta/Ecoli.fa /path/to/bowtie2Index/Ecoli
 bowtie2 --end-to-end --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700 -p ${cores} -x ${spikeInRef} -1 ${projPath}/fastq/${histName}_R1.fastq.gz -2 ${projPath}/fastq/${histName}_R2.fastq.gz -S $projPath/alignment/sam/${histName}_bowtie2_spikeIn.sam &> $projPath/alignment/sam/bowtie2_summary/${histName}_bowtie2_spikeIn.txt
 
-seqDepthDouble=`samtools view -F 0x04 seqDepth=$((seqDepthDouble/2))
+seqDepthDouble=`samtools view -F 0x04 $projPath/alignment/sam/${histName}_bowtie2_spikeIn.sam | wc -l`
+seqDepth=$((seqDepthDouble/2))
 echo $seqDepth >$projPath/alignment/sam/bowtie2_summary/${histName}_bowtie2_spikeIn.seqDepth
 
 ```
@@ -440,7 +441,7 @@ alignDupSummary
 
 - In these example datasets, the IgG control samples have relatively high duplication rates, since reads in this sample derive from non-specific tagmentation in the CUT&Tag reactions. Therefore, it is appropriate to remove the duplicates from the IgG datasets before downstream analysis. 
 
-- The estimated library size is the estimated number of unique molecules in the library based on PE duplication calculated by Picard.
+- The estimated library size are the estimated number of unique molecules in the library based on PE duplication calculated by Picard.
 
 - The estimated library sizes is proportional to the abundance of the targeted epitope and to the quality of the antibody used, while the estimated library sizes of IgG samples are expected to be very low.
 
@@ -531,7 +532,7 @@ ggarrange(fig5A, fig5B, ncol = 2)
 
 ## 3.5 Assess replicate reproducibility
 
-Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. For the simplicity of implementation, we will postone this analysis after Section IV when the file format has been converted into fragment bed files.
+Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. For the simplicity of implementation, we will postpone this analysis after Section IV when the file format has been converted into fragment bed files.
 
 
 # IV. Alignment results filtering and file format conversion
@@ -586,7 +587,7 @@ awk -v w=$binLen '{print $1, int(($2 + $3)/(2*w))*w + w/2}' $projPath/alignment/
 ```
 
 ```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.height=7}
-
+##== R command ==##
 reprod = c()
 fragCount = NULL
 for(hist in sampleList){
@@ -612,7 +613,7 @@ corrplot(M, method = "color", outline = T, addgrid.col = "darkgray", order="hclu
 
 # V. Spike-in calibration 
 
-This section is **optional** but **recommended** depending on your experimental protocol. We have shown the alingment to the spike-in genome in Section 3.1.2 and the spike-in alignment summary in Section 3.2.2.
+This section is **optional** but **recommended** depending on your experimental protocol. We have shown the alignment to the spike-in genome in Section 3.1.2 and the spike-in alignment summary in Section 3.2.2.
 
 
 The underlying assumption is that the ratio of fragments mapped to the primary genome to the E. coli genome is the same for a series of samples, each using the same number of cells. Because of this assumption, we do not normalize between experiments or between batches of purified pATn5, which can have very different amounts of carry-over E. coli DNA. Using a constant C to avoid small fractions in normalized data, we define a scaling factor S as 
