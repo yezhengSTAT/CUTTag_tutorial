@@ -425,7 +425,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-08-10
+<strong>Last updated:</strong> 2021-02-01
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
@@ -540,16 +540,16 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomyezhengSTATCUTTagtutorialtree438c1a5881735ee1c4e4ebe25542173b07a9cf98targetblank438c1a5a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/tree/438c1a5881735ee1c4e4ebe25542173b07a9cf98" target="_blank">438c1a5</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomyezhengSTATCUTTagtutorialtree4ff93d77d1a1dfd05ff69489d428c098a1779703targetblank4ff93d7a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/tree/4ff93d77d1a1dfd05ff69489d428c098a1779703" target="_blank">4ff93d7</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomyezhengSTATCUTTagtutorialtree438c1a5881735ee1c4e4ebe25542173b07a9cf98targetblank438c1a5a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomyezhengSTATCUTTagtutorialtree4ff93d77d1a1dfd05ff69489d428c098a1779703targetblank4ff93d7a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/tree/438c1a5881735ee1c4e4ebe25542173b07a9cf98" target="_blank">438c1a5</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/tree/4ff93d77d1a1dfd05ff69489d428c098a1779703" target="_blank">4ff93d7</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -564,7 +564,6 @@ Ignored files:
 Untracked files:
     Untracked:  ._.DS_Store
     Untracked:  alignment/
-    Untracked:  analysis/figures/CUTTag_Tuto_Diagram.png
     Untracked:  data/IgG_old/
     Untracked:  data/IgG_rep1/
     Untracked:  data/IgG_rep2/
@@ -578,7 +577,7 @@ Untracked files:
     Untracked:  peakCalling/
 
 Unstaged changes:
-    Deleted:    analysis/figures/CUTTag_Diagram.png
+    Modified:   analysis/pipeline2.sh
 
 </code></pre>
 <p>
@@ -617,6 +616,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/4ff93d77d1a1dfd05ff69489d428c098a1779703/analysis/tutorials.Rmd" target="_blank">4ff93d7</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2021-02-01
+</td>
+<td>
+edit typo
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/421e40f4713aff3af285e6939b1f55dd407633e6/analysis/tutorials.Rmd" target="_blank">421e40f</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-08-20
+</td>
+<td>
+update minor issues
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/yezhengSTAT/CUTTag_tutorial/b2993411ac609462d4ebc4b7ce1446e327a00e56/docs/tutorials.html" target="_blank">b299341</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-08-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -989,7 +1039,8 @@ chromSize=&quot;/fh/fast/gottardo_r/yezheng_working/SupplementaryData/hg38/chrom
 ## bowtie2-build path/to/Ecoli/fasta/Ecoli.fa /path/to/bowtie2Index/Ecoli
 bowtie2 --end-to-end --very-sensitive --no-mixed --no-discordant --phred33 -I 10 -X 700 -p ${cores} -x ${spikeInRef} -1 ${projPath}/fastq/${histName}_R1.fastq.gz -2 ${projPath}/fastq/${histName}_R2.fastq.gz -S $projPath/alignment/sam/${histName}_bowtie2_spikeIn.sam &amp;&gt; $projPath/alignment/sam/bowtie2_summary/${histName}_bowtie2_spikeIn.txt
 
-seqDepthDouble=`samtools view -F 0x04 seqDepth=$((seqDepthDouble/2))
+seqDepthDouble=`samtools view -F 0x04 $projPath/alignment/sam/${histName}_bowtie2_spikeIn.sam | wc -l`
+seqDepth=$((seqDepthDouble/2))
 echo $seqDepth &gt;$projPath/alignment/sam/bowtie2_summary/${histName}_bowtie2_spikeIn.seqDepth
 </code></pre>
 <ul>
@@ -1157,6 +1208,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/b2993411ac609462d4ebc4b7ce1446e327a00e56/docs/figure/tutorials.Rmd/unnamed-chunk-12-1.png" target="_blank">b299341</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-08-10
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/d7f438eb1c959c4b627814b1aa1f07850756b6bd/docs/figure/tutorials.Rmd/unnamed-chunk-12-1.png" target="_blank">d7f438e</a>
 </td>
 <td>
@@ -1179,7 +1241,7 @@ yezhengSTAT
 <pre class="bash"><code>##== linux command ==##
 ## depending on how you load picard and your server environment, the picardCMD can be different. Adjust accordingly.
 picardCMD=&quot;java -jar picard.jar&quot;
-mkdir -p $projPath/alignment/rmDuplicate/picard_summary
+mkdir -p $projPath/alignment/removeDuplicate/picard_summary
 
 ## Sort by coordinate
 $picardCMD SortSam I=$projPath/alignment/sam/${histName}_bowtie2.sam O=$projPath/alignment/sam/${histName}_bowtie2.sorted.sam SORT_ORDER=coordinate
@@ -1194,7 +1256,7 @@ picardCMD MarkDuplicates I=$projPath/alignment/sam/${histName}_bowtie2.sorted.sa
 ## Summarize the duplication information from the picard summary outputs.
 dupResult = c()
 for(hist in sampleList){
-  dupRes = read.table(paste0(projPath, &quot;/alignment/rmDuplicate/picard_summary/&quot;, hist, &quot;_picard.rmDup.txt&quot;), header = TRUE, fill = TRUE)
+  dupRes = read.table(paste0(projPath, &quot;/alignment/removeDuplicate/picard_summary/&quot;, hist, &quot;_picard.rmDup.txt&quot;), header = TRUE, fill = TRUE)
   
   histInfo = strsplit(hist, &quot;_&quot;)[[1]]
   dupResult = data.frame(Histone = histInfo[1], Replicate = histInfo[2], MappedFragNum_hg38 = dupRes$READ_PAIRS_EXAMINED[1] %&gt;% as.character %&gt;% as.numeric, DuplicationRate = dupRes$PERCENT_DUPLICATION[1] %&gt;% as.character %&gt;% as.numeric * 100, EstimatedLibrarySize = dupRes$ESTIMATED_LIBRARY_SIZE[1] %&gt;% as.character %&gt;% as.numeric) %&gt;% mutate(UniqueFragNum = MappedFragNum_hg38 * (1-DuplicationRate/100))  %&gt;% rbind(dupResult, .)
@@ -1209,7 +1271,7 @@ alignDupSummary</code></pre>
 </div>
 <ul>
 <li><p>In these example datasets, the IgG control samples have relatively high duplication rates, since reads in this sample derive from non-specific tagmentation in the CUT&amp;Tag reactions. Therefore, it is appropriate to remove the duplicates from the IgG datasets before downstream analysis.</p></li>
-<li><p>The estimated library size is the estimated number of unique molecules in the library based on PE duplication calculated by Picard.</p></li>
+<li><p>The estimated library size are the estimated number of unique molecules in the library based on PE duplication calculated by Picard.</p></li>
 <li><p>The estimated library sizes is proportional to the abundance of the targeted epitope and to the quality of the antibody used, while the estimated library sizes of IgG samples are expected to be very low.</p></li>
 <li><p>Unique fragment number is calculated by the MappedFragNum_hg38 * (1-DuplicationRate/100).</p></li>
 </ul>
@@ -1266,6 +1328,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/b2993411ac609462d4ebc4b7ce1446e327a00e56/docs/figure/tutorials.Rmd/unnamed-chunk-15-1.png" target="_blank">b299341</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-08-10
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/d7f438eb1c959c4b627814b1aa1f07850756b6bd/docs/figure/tutorials.Rmd/unnamed-chunk-15-1.png" target="_blank">d7f438e</a>
@@ -1345,6 +1418,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/b2993411ac609462d4ebc4b7ce1446e327a00e56/docs/figure/tutorials.Rmd/unnamed-chunk-17-1.png" target="_blank">b299341</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-08-10
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/d7f438eb1c959c4b627814b1aa1f07850756b6bd/docs/figure/tutorials.Rmd/unnamed-chunk-17-1.png" target="_blank">d7f438e</a>
 </td>
 <td>
@@ -1364,7 +1448,7 @@ yezhengSTAT
 </div>
 <div id="assess-replicate-reproducibility" class="section level2">
 <h2>3.5 Assess replicate reproducibility</h2>
-<p>Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. For the simplicity of implementation, we will postone this analysis after Section IV when the file format has been converted into fragment bed files.</p>
+<p>Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. For the simplicity of implementation, we will postpone this analysis after Section IV when the file format has been converted into fragment bed files.</p>
 </div>
 </div>
 <div id="iv.-alignment-results-filtering-and-file-format-conversion" class="section level1">
@@ -1387,13 +1471,13 @@ samtools view -q $minQualityScore ${projPath}/alignment/sam/${histName}_bowtie2.
 <p>This section is <strong>required</strong> in preparation for the peak calling and visualization where there are a few filtering and file format conversion that need to be done.</p>
 <pre class="bash"><code>##== linux command ==##
 ## Filter and keep the mapped read pairs
-samtools view -bS -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam $projPath/alignment/bam/${histName}_bowtie2.mapped.bam
+samtools view -bS -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam &gt;$projPath/alignment/bam/${histName}_bowtie2.mapped.bam
 
 ## Convert into bed file format
-bedtools bamtobed -i $projPath/alignment/bam/${histName}_bowtie2.mapped.bam -bedpe $projPath/alignment/bed/${histName}_bowtie2.bed
+bedtools bamtobed -i $projPath/alignment/bam/${histName}_bowtie2.mapped.bam -bedpe &gt;$projPath/alignment/bed/${histName}_bowtie2.bed
 
 ## Keep the read pairs that are on the same chromosome and fragment length less than 1000bp.
-awk &#39;$1==$4 &amp;&amp; $6-$2 &lt; 1000 {print $0}&#39; $projPath/alignment/bed/${histName}_bowtie2.bed $projPath/alignment/bed/${histName}_bowtie2.clean.bed
+awk &#39;$1==$4 &amp;&amp; $6-$2 &lt; 1000 {print $0}&#39; $projPath/alignment/bed/${histName}_bowtie2.bed &gt;$projPath/alignment/bed/${histName}_bowtie2.clean.bed
 
 ## Only extract the fragment related columns
 cut -f 1,2,6 $projPath/alignment/bed/${histName}_bowtie2.clean.bed | sort -k1,1 -k2,2n -k3,3n  &gt;$projPath/alignment/bed/${histName}_bowtie2.fragments.bed</code></pre>
@@ -1406,7 +1490,8 @@ cut -f 1,2,6 $projPath/alignment/bed/${histName}_bowtie2.clean.bed | sort -k1,1 
 binLen=500
 awk -v w=$binLen &#39;{print $1, int(($2 + $3)/(2*w))*w + w/2}&#39; $projPath/alignment/bed/${histName}_bowtie2.fragments.bed | sort -k1,1V -k2,2n | uniq -c | awk -v OFS=&quot;\t&quot; &#39;{print $2, $3, $1}&#39; |  sort -k1,1V -k2,2n  &gt;$projPath/alignment/bed/${histName}_bowtie2.fragmentsCount.bin$binLen.bed
 </code></pre>
-<pre class="r"><code>reprod = c()
+<pre class="r"><code>##== R command ==##
+reprod = c()
 fragCount = NULL
 for(hist in sampleList){
   
@@ -1452,6 +1537,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/b2993411ac609462d4ebc4b7ce1446e327a00e56/docs/figure/tutorials.Rmd/unnamed-chunk-21-1.png" target="_blank">b299341</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-08-10
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/d544756d9ed67d5e7ab554eb1fd2fc9e410c5f13/docs/figure/tutorials.Rmd/unnamed-chunk-21-1.png" target="_blank">d544756</a>
 </td>
 <td>
@@ -1469,7 +1565,7 @@ yezhengSTAT
 </div>
 <div id="v.-spike-in-calibration" class="section level1">
 <h1>V. Spike-in calibration</h1>
-<p>This section is <strong>optional</strong> but <strong>recommended</strong> depending on your experimental protocol. We have shown the alingment to the spike-in genome in Section 3.1.2 and the spike-in alignment summary in Section 3.2.2.</p>
+<p>This section is <strong>optional</strong> but <strong>recommended</strong> depending on your experimental protocol. We have shown the alignment to the spike-in genome in Section 3.1.2 and the spike-in alignment summary in Section 3.2.2.</p>
 <p>The underlying assumption is that the ratio of fragments mapped to the primary genome to the E. coli genome is the same for a series of samples, each using the same number of cells. Because of this assumption, we do not normalize between experiments or between batches of purified pATn5, which can have very different amounts of carry-over E. coli DNA. Using a constant C to avoid small fractions in normalized data, we define a scaling factor S as</p>
 <p><code>S = C / (fragments mapped to E. coli genome)</code></p>
 <p>Normalized coverage is then calculated as:</p>
@@ -1549,6 +1645,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/b2993411ac609462d4ebc4b7ce1446e327a00e56/docs/figure/tutorials.Rmd/unnamed-chunk-24-1.png" target="_blank">b299341</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-08-10
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/d544756d9ed67d5e7ab554eb1fd2fc9e410c5f13/docs/figure/tutorials.Rmd/unnamed-chunk-24-1.png" target="_blank">d544756</a>
@@ -1711,6 +1818,43 @@ fig7D = frip %&gt;% ggplot(aes(x = Histone, y = frip, fill = Histone, label = ro
 
 ggarrange(fig7A, fig7B, fig7C, fig7D, ncol = 2, nrow=2, common.legend = TRUE, legend=&quot;bottom&quot;)</code></pre>
 <p><img src="figure/tutorials.Rmd/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-29-1">
+Past versions of unnamed-chunk-29-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-29-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/yezhengSTAT/CUTTag_tutorial/blob/b2993411ac609462d4ebc4b7ce1446e327a00e56/docs/figure/tutorials.Rmd/unnamed-chunk-29-1.png" target="_blank">b299341</a>
+</td>
+<td>
+yezhengSTAT
+</td>
+<td>
+2020-08-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1930,15 +2074,20 @@ macs2 callpeak -t ${projPath}/alignment/bam/${histName}_rep1_bowtie2.mapped.bam 
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.0.0 (2020-04-24)
+<pre><code>R version 4.0.2 (2020-06-22)
 Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 18.04.4 LTS
+Running under: Ubuntu 18.04.5 LTS
 
 Matrix products: default
 BLAS/LAPACK: /app/software/OpenBLAS/0.3.7-GCC-8.3.0/lib/libopenblas_haswellp-r0.3.7.so
 
 locale:
-[1] en_US.UTF-8
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
 attached base packages:
 [1] parallel  stats4    stats     graphics  grDevices utils     datasets 
@@ -1947,77 +2096,77 @@ attached base packages:
 other attached packages:
  [1] corrplot_0.84               ggpubr_0.4.0               
  [3] DESeq2_1.28.1               SummarizedExperiment_1.18.2
- [5] DelayedArray_0.14.1         matrixStats_0.56.0         
+ [5] DelayedArray_0.14.1         matrixStats_0.57.0         
  [7] Biobase_2.48.0              chromVAR_1.10.0            
  [9] GenomicRanges_1.40.0        GenomeInfoDb_1.24.2        
 [11] IRanges_2.22.2              S4Vectors_0.26.1           
 [13] BiocGenerics_0.34.0         viridis_0.5.1              
 [15] viridisLite_0.3.0           ggplot2_3.3.2              
-[17] stringr_1.4.0               dplyr_1.0.1                
+[17] stringr_1.4.0               dplyr_1.0.2                
 [19] workflowr_1.6.2            
 
 loaded via a namespace (and not attached):
   [1] colorspace_1.4-1            ggsignif_0.6.0             
   [3] rio_0.5.16                  ellipsis_0.3.1             
-  [5] rprojroot_1.3-2             XVector_0.28.0             
-  [7] fs_1.4.1                    farver_2.0.3               
-  [9] DT_0.14                     bit64_4.0.2                
- [11] AnnotationDbi_1.50.3        splines_4.0.0              
- [13] R.methodsS3_1.8.0           geneplotter_1.66.0         
- [15] knitr_1.28                  jsonlite_1.7.0             
- [17] Cairo_1.5-12                Rsamtools_2.4.0            
- [19] seqLogo_1.54.3              broom_0.5.6                
- [21] annotate_1.66.0             GO.db_3.11.4               
- [23] png_0.1-7                   R.oo_1.23.0                
- [25] shiny_1.5.0                 readr_1.3.1                
- [27] compiler_4.0.0              httr_1.4.2                 
- [29] backports_1.1.8             Matrix_1.2-18              
- [31] fastmap_1.0.1               lazyeval_0.2.2             
- [33] later_1.1.0.1               htmltools_0.5.0            
- [35] tools_4.0.0                 gtable_0.3.0               
- [37] glue_1.4.1                  TFMPvalue_0.0.8            
- [39] GenomeInfoDbData_1.2.3      reshape2_1.4.4             
- [41] Rcpp_1.0.5                  carData_3.0-3              
- [43] cellranger_1.1.0            vctrs_0.3.2                
- [45] Biostrings_2.56.0           nlme_3.1-147               
- [47] rtracklayer_1.48.0          xfun_0.13                  
- [49] CNEr_1.24.0                 openxlsx_4.1.4             
- [51] mime_0.9                    miniUI_0.1.1.1             
- [53] lifecycle_0.2.0             poweRlaw_0.70.6            
- [55] gtools_3.8.2                rstatix_0.6.0              
- [57] XML_3.99-0.5                zlibbioc_1.34.0            
- [59] scales_1.1.1                BSgenome_1.56.0            
- [61] hms_0.5.3                   promises_1.1.1             
- [63] RColorBrewer_1.1-2          curl_4.3                   
- [65] yaml_2.2.1                  memoise_1.1.0              
- [67] gridExtra_2.3               stringi_1.4.6              
- [69] RSQLite_2.2.0               highr_0.8                  
- [71] genefilter_1.70.0           caTools_1.18.0             
- [73] zip_2.0.4                   BiocParallel_1.22.0        
- [75] rlang_0.4.7                 pkgconfig_2.0.3            
- [77] bitops_1.0-6                pracma_2.2.9               
- [79] evaluate_0.14               lattice_0.20-41            
- [81] purrr_0.3.4                 labeling_0.3               
- [83] GenomicAlignments_1.24.0    htmlwidgets_1.5.1          
- [85] cowplot_1.0.0               bit_4.0.4                  
- [87] tidyselect_1.1.0            plyr_1.8.6                 
- [89] magrittr_1.5                R6_2.4.1                   
- [91] generics_0.0.2              DBI_1.1.0                  
- [93] haven_2.2.0                 foreign_0.8-79             
- [95] pillar_1.4.6                whisker_0.4                
- [97] withr_2.2.0                 abind_1.4-5                
- [99] survival_3.1-12             KEGGREST_1.28.0            
-[101] RCurl_1.98-1.2              tibble_3.0.3               
-[103] car_3.0-7                   crayon_1.3.4               
-[105] plotly_4.9.2.1              rmarkdown_2.1              
-[107] TFBSTools_1.26.0            readxl_1.3.1               
-[109] locfit_1.5-9.4              grid_4.0.0                 
-[111] data.table_1.13.0           blob_1.2.1                 
-[113] git2r_0.26.1                forcats_0.5.0              
-[115] digest_0.6.25               xtable_1.8-4               
-[117] tidyr_1.1.1                 httpuv_1.5.4               
-[119] R.utils_2.9.2               munsell_0.5.0              
-[121] DirichletMultinomial_1.30.0</code></pre>
+  [5] rprojroot_2.0.2             XVector_0.28.0             
+  [7] fs_1.4.2                    rstudioapi_0.11            
+  [9] farver_2.0.3                DT_0.16                    
+ [11] bit64_4.0.5                 AnnotationDbi_1.50.3       
+ [13] splines_4.0.2               R.methodsS3_1.8.0          
+ [15] geneplotter_1.66.0          knitr_1.29                 
+ [17] jsonlite_1.7.2              Cairo_1.5-12               
+ [19] Rsamtools_2.4.0             seqLogo_1.54.3             
+ [21] broom_0.5.6                 annotate_1.66.0            
+ [23] GO.db_3.11.4                png_0.1-7                  
+ [25] R.oo_1.23.0                 shiny_1.5.0                
+ [27] readr_1.3.1                 compiler_4.0.2             
+ [29] httr_1.4.2                  backports_1.2.1            
+ [31] Matrix_1.2-18               fastmap_1.0.1              
+ [33] lazyeval_0.2.2              later_1.1.0.1              
+ [35] htmltools_0.5.0             tools_4.0.2                
+ [37] gtable_0.3.0                glue_1.4.2                 
+ [39] TFMPvalue_0.0.8             GenomeInfoDbData_1.2.3     
+ [41] reshape2_1.4.4              Rcpp_1.0.5                 
+ [43] carData_3.0-4               cellranger_1.1.0           
+ [45] vctrs_0.3.5                 Biostrings_2.56.0          
+ [47] nlme_3.1-148                rtracklayer_1.48.0         
+ [49] xfun_0.15                   CNEr_1.24.0                
+ [51] openxlsx_4.1.5              mime_0.9                   
+ [53] miniUI_0.1.1.1              lifecycle_0.2.0            
+ [55] poweRlaw_0.70.6             gtools_3.8.2               
+ [57] rstatix_0.6.0               XML_3.99-0.5               
+ [59] zlibbioc_1.34.0             scales_1.1.1               
+ [61] BSgenome_1.56.0             hms_0.5.3                  
+ [63] promises_1.1.1              RColorBrewer_1.1-2         
+ [65] curl_4.3                    yaml_2.2.1                 
+ [67] memoise_1.1.0               gridExtra_2.3              
+ [69] stringi_1.5.3               RSQLite_2.2.0              
+ [71] highr_0.8                   genefilter_1.70.0          
+ [73] caTools_1.18.0              zip_2.0.4                  
+ [75] BiocParallel_1.22.0         rlang_0.4.9                
+ [77] pkgconfig_2.0.3             bitops_1.0-6               
+ [79] pracma_2.2.9                evaluate_0.14              
+ [81] lattice_0.20-41             purrr_0.3.4                
+ [83] labeling_0.4.2              GenomicAlignments_1.24.0   
+ [85] htmlwidgets_1.5.3           cowplot_1.1.0              
+ [87] bit_4.0.4                   tidyselect_1.1.0           
+ [89] plyr_1.8.6                  magrittr_1.5               
+ [91] R6_2.5.0                    generics_0.0.2             
+ [93] DBI_1.1.0                   haven_2.3.1                
+ [95] foreign_0.8-80              pillar_1.4.7               
+ [97] whisker_0.4                 withr_2.3.0                
+ [99] abind_1.4-5                 survival_3.2-3             
+[101] KEGGREST_1.28.0             RCurl_1.98-1.2             
+[103] tibble_3.0.4                car_3.0-8                  
+[105] crayon_1.3.4                plotly_4.9.2.1             
+[107] rmarkdown_2.3               TFBSTools_1.26.0           
+[109] readxl_1.3.1                locfit_1.5-9.4             
+[111] grid_4.0.2                  data.table_1.13.4          
+[113] blob_1.2.1                  git2r_0.27.1               
+[115] forcats_0.5.0               digest_0.6.27              
+[117] xtable_1.8-4                tidyr_1.1.2                
+[119] httpuv_1.5.4                R.utils_2.9.2              
+[121] munsell_0.5.0               DirichletMultinomial_1.30.0</code></pre>
 </div>
 </div>
 
@@ -2088,7 +2237,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0
