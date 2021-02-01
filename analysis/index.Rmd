@@ -408,7 +408,7 @@ CUT&Tag integrates adapters into DNA in the vicinity of the antibody-tethered pA
 ##== linux command ==##
 ## depending on how you load picard and your server environment, the picardCMD can be different. Adjust accordingly.
 picardCMD="java -jar picard.jar"
-mkdir -p $projPath/alignment/rmDuplicate/picard_summary
+mkdir -p $projPath/alignment/removeDuplicate/picard_summary
 
 ## Sort by coordinate
 $picardCMD SortSam I=$projPath/alignment/sam/${histName}_bowtie2.sam O=$projPath/alignment/sam/${histName}_bowtie2.sorted.sam SORT_ORDER=coordinate
@@ -428,7 +428,7 @@ We summarize the apparent duplication rate and calculate the unique library size
 ## Summarize the duplication information from the picard summary outputs.
 dupResult = c()
 for(hist in sampleList){
-  dupRes = read.table(paste0(projPath, "/alignment/rmDuplicate/picard_summary/", hist, "_picard.rmDup.txt"), header = TRUE, fill = TRUE)
+  dupRes = read.table(paste0(projPath, "/alignment/removeDuplicate/picard_summary/", hist, "_picard.rmDup.txt"), header = TRUE, fill = TRUE)
   
   histInfo = strsplit(hist, "_")[[1]]
   dupResult = data.frame(Histone = histInfo[1], Replicate = histInfo[2], MappedFragNum_hg38 = dupRes$READ_PAIRS_EXAMINED[1] %>% as.character %>% as.numeric, DuplicationRate = dupRes$PERCENT_DUPLICATION[1] %>% as.character %>% as.numeric * 100, EstimatedLibrarySize = dupRes$ESTIMATED_LIBRARY_SIZE[1] %>% as.character %>% as.numeric) %>% mutate(UniqueFragNum = MappedFragNum_hg38 * (1-DuplicationRate/100))  %>% rbind(dupResult, .)
@@ -561,13 +561,13 @@ This section is **required** in preparation for the peak calling and visualizati
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
 ## Filter and keep the mapped read pairs
-samtools view -bS -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam $projPath/alignment/bam/${histName}_bowtie2.mapped.bam
+samtools view -bS -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam >$projPath/alignment/bam/${histName}_bowtie2.mapped.bam
 
 ## Convert into bed file format
-bedtools bamtobed -i $projPath/alignment/bam/${histName}_bowtie2.mapped.bam -bedpe $projPath/alignment/bed/${histName}_bowtie2.bed
+bedtools bamtobed -i $projPath/alignment/bam/${histName}_bowtie2.mapped.bam -bedpe >$projPath/alignment/bed/${histName}_bowtie2.bed
 
 ## Keep the read pairs that are on the same chromosome and fragment length less than 1000bp.
-awk '$1==$4 && $6-$2 < 1000 {print $0}' $projPath/alignment/bed/${histName}_bowtie2.bed $projPath/alignment/bed/${histName}_bowtie2.clean.bed
+awk '$1==$4 && $6-$2 < 1000 {print $0}' $projPath/alignment/bed/${histName}_bowtie2.bed >$projPath/alignment/bed/${histName}_bowtie2.clean.bed
 
 ## Only extract the fragment related columns
 cut -f 1,2,6 $projPath/alignment/bed/${histName}_bowtie2.clean.bed | sort -k1,1 -k2,2n -k3,3n  >$projPath/alignment/bed/${histName}_bowtie2.fragments.bed
