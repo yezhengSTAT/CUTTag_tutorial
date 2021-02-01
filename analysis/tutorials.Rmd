@@ -408,7 +408,7 @@ CUT&Tag integrates adapters into DNA in the vicinity of the antibody-tethered pA
 ##== linux command ==##
 ## depending on how you load picard and your server environment, the picardCMD can be different. Adjust accordingly.
 picardCMD="java -jar picard.jar"
-mkdir -p $projPath/alignment/rmDuplicate/picard_summary
+mkdir -p $projPath/alignment/removeDuplicate/picard_summary
 
 ## Sort by coordinate
 $picardCMD SortSam I=$projPath/alignment/sam/${histName}_bowtie2.sam O=$projPath/alignment/sam/${histName}_bowtie2.sorted.sam SORT_ORDER=coordinate
@@ -428,7 +428,7 @@ We summarize the apparent duplication rate and calculate the unique library size
 ## Summarize the duplication information from the picard summary outputs.
 dupResult = c()
 for(hist in sampleList){
-  dupRes = read.table(paste0(projPath, "/alignment/rmDuplicate/picard_summary/", hist, "_picard.rmDup.txt"), header = TRUE, fill = TRUE)
+  dupRes = read.table(paste0(projPath, "/alignment/removeDuplicate/picard_summary/", hist, "_picard.rmDup.txt"), header = TRUE, fill = TRUE)
   
   histInfo = strsplit(hist, "_")[[1]]
   dupResult = data.frame(Histone = histInfo[1], Replicate = histInfo[2], MappedFragNum_hg38 = dupRes$READ_PAIRS_EXAMINED[1] %>% as.character %>% as.numeric, DuplicationRate = dupRes$PERCENT_DUPLICATION[1] %>% as.character %>% as.numeric * 100, EstimatedLibrarySize = dupRes$ESTIMATED_LIBRARY_SIZE[1] %>% as.character %>% as.numeric) %>% mutate(UniqueFragNum = MappedFragNum_hg38 * (1-DuplicationRate/100))  %>% rbind(dupResult, .)
@@ -441,7 +441,7 @@ alignDupSummary
 
 - In these example datasets, the IgG control samples have relatively high duplication rates, since reads in this sample derive from non-specific tagmentation in the CUT&Tag reactions. Therefore, it is appropriate to remove the duplicates from the IgG datasets before downstream analysis. 
 
-- The estimated library size is the estimated number of unique molecules in the library based on PE duplication calculated by Picard.
+- The estimated library size are the estimated number of unique molecules in the library based on PE duplication calculated by Picard.
 
 - The estimated library sizes is proportional to the abundance of the targeted epitope and to the quality of the antibody used, while the estimated library sizes of IgG samples are expected to be very low.
 
@@ -532,7 +532,7 @@ ggarrange(fig5A, fig5B, ncol = 2)
 
 ## 3.5 Assess replicate reproducibility
 
-Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. For the simplicity of implementation, we will postone this analysis after Section IV when the file format has been converted into fragment bed files.
+Data reproducibility between replicates is assessed by correlation analysis of mapped read counts across the genome. For the simplicity of implementation, we will postpone this analysis after Section IV when the file format has been converted into fragment bed files.
 
 
 # IV. Alignment results filtering and file format conversion
@@ -561,13 +561,13 @@ This section is **required** in preparation for the peak calling and visualizati
 ```{r, engine = 'bash', eval = FALSE}
 ##== linux command ==##
 ## Filter and keep the mapped read pairs
-samtools view -bS -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam $projPath/alignment/bam/${histName}_bowtie2.mapped.bam
+samtools view -bS -F 0x04 $projPath/alignment/sam/${histName}_bowtie2.sam >$projPath/alignment/bam/${histName}_bowtie2.mapped.bam
 
 ## Convert into bed file format
-bedtools bamtobed -i $projPath/alignment/bam/${histName}_bowtie2.mapped.bam -bedpe $projPath/alignment/bed/${histName}_bowtie2.bed
+bedtools bamtobed -i $projPath/alignment/bam/${histName}_bowtie2.mapped.bam -bedpe >$projPath/alignment/bed/${histName}_bowtie2.bed
 
 ## Keep the read pairs that are on the same chromosome and fragment length less than 1000bp.
-awk '$1==$4 && $6-$2 < 1000 {print $0}' $projPath/alignment/bed/${histName}_bowtie2.bed $projPath/alignment/bed/${histName}_bowtie2.clean.bed
+awk '$1==$4 && $6-$2 < 1000 {print $0}' $projPath/alignment/bed/${histName}_bowtie2.bed >$projPath/alignment/bed/${histName}_bowtie2.clean.bed
 
 ## Only extract the fragment related columns
 cut -f 1,2,6 $projPath/alignment/bed/${histName}_bowtie2.clean.bed | sort -k1,1 -k2,2n -k3,3n  >$projPath/alignment/bed/${histName}_bowtie2.fragments.bed
@@ -587,7 +587,7 @@ awk -v w=$binLen '{print $1, int(($2 + $3)/(2*w))*w + w/2}' $projPath/alignment/
 ```
 
 ```{r echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.height=7}
-
+##== R command ==##
 reprod = c()
 fragCount = NULL
 for(hist in sampleList){
@@ -613,7 +613,7 @@ corrplot(M, method = "color", outline = T, addgrid.col = "darkgray", order="hclu
 
 # V. Spike-in calibration 
 
-This section is **optional** but **recommended** depending on your experimental protocol. We have shown the alingment to the spike-in genome in Section 3.1.2 and the spike-in alignment summary in Section 3.2.2.
+This section is **optional** but **recommended** depending on your experimental protocol. We have shown the alignment to the spike-in genome in Section 3.1.2 and the spike-in alignment summary in Section 3.2.2.
 
 
 The underlying assumption is that the ratio of fragments mapped to the primary genome to the E. coli genome is the same for a series of samples, each using the same number of cells. Because of this assumption, we do not normalize between experiments or between batches of purified pATn5, which can have very different amounts of carry-over E. coli DNA. Using a constant C to avoid small fractions in normalized data, we define a scaling factor S as 
